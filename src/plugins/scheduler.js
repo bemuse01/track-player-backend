@@ -2,7 +2,11 @@ import { initTrackQueue } from '../queues/trackQueue.js'
 
 
 const scheduler = async (fastify, options) => {
-    await initTrackQueue()
+    try{
+        await initTrackQueue()
+    }catch(err){
+        console.log(err)
+    }
 }
 
 

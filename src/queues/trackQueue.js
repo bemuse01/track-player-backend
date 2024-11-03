@@ -42,8 +42,12 @@ const trackWorker = new Worker(queueName, processor, {connection})
 
 // 
 const initTrackQueue = async () => {
-    await trackQueue.obliterate()
-    await trackQueue.upsertJobScheduler(schedulerId, repeatOption, jobTemplate)
+    try{
+        await trackQueue.obliterate()
+        await trackQueue.upsertJobScheduler(schedulerId, repeatOption, jobTemplate)
+    }catch(err){
+        throw new Error(err.message)
+    }
 }
 
 
