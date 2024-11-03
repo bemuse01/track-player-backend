@@ -10,13 +10,15 @@ const connectDatabase = async () => {
     }
 }
 
-const disconnectDatabase = async () => {
+const disconnectDatabase = async (msg) => {
     await mongoose.connection.close()
-    console.log('disconnect database')
+    console.log(msg + ' database disconnected')
+    process.exit(0)
 }
 
 const dbConnector = async (fastify, options) => {
-    fastify.addHook('onClose', disconnectDatabase)
+    fastify.addHook('onClose', async () => disconnectDatabase('on close:'))
+    process.on('SIGINT', async () => disconnectDatabase('SIGINT:'))
 
     await connectDatabase()
 }
