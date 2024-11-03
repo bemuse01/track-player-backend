@@ -23,7 +23,13 @@ const repeatOption = {
 }
 const jobTemplate = {
     name: 'new-job',
-    data: {msg: 'hello'},
+    data: {
+        msg: 'hello'
+    },
+    opts: {
+        removeOnComplete: true, 
+        removeOnFail: true 
+    }
 }
 
 
@@ -36,6 +42,7 @@ const trackWorker = new Worker(queueName, processor, {connection})
 
 // 
 const initTrackQueue = async () => {
+    await trackQueue.obliterate()
     await trackQueue.upsertJobScheduler(schedulerId, repeatOption, jobTemplate)
 }
 
