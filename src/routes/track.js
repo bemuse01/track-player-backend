@@ -29,7 +29,12 @@ const trackHandler = async (request, reply) => {
     const main_color = Math.floor(Math.random() * 255 * 255 * 255).toString(16)
     const data = {id, artist, title, media_file, thumbnail, main_color}
 
-    await insertTrack(data)
+    try{
+        await insertTrack(data)
+    }catch(err){
+        console.log(err)        
+    }
+
     return {id, artist, title, main_color}
 }
 const track = async (fastify, options) => {

@@ -11,9 +11,9 @@ const insertTrack = async ({id, artist = '', title = '', media_file = '', thumbn
 
     try{
         await Track.insertMany(tracks)
-        console.log('success')
+        console.log('success to insert')
     }catch(err){
-        console.log('failed', err)
+        throw new Error('failed to insert' + err.message)
     }
 }
 
