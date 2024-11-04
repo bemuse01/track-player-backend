@@ -13,8 +13,6 @@ const toHex = (r, g, b) => {
 const processImage = async (id, url) => {
     try{
 
-        const url = 'https://i.ytimg.com/vi/PiIAVnFX2eo/maxresdefault.jpg'
-
         const response = await axios({url, responseType: 'arraybuffer'})
         const input = response.data
         const image = sharp(input)
