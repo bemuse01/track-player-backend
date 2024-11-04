@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "agenda": "^5.0.0",
+    "axios": "^1.7.7",
     "bullmq": "^5.23.0",
     "dotenv": "^16.4.5",
     "fastify": "^5.1.0",

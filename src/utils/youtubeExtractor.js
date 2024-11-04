@@ -46,7 +46,7 @@ const getPlaylistItems = async () => {
                 const {url} = thumbnails.maxres
                 const {videoId} = resourceId
 
-                return {title, thumbnail: url, videoId}
+                return {title, thumbnail: url, id: videoId}
             })
             listItems.push(...items)
             
