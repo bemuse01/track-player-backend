@@ -12,6 +12,7 @@ const workTrack = async () => {
     const colors = await Promise.all(items.map(({id, thumbnail}) => processImage(id, thumbnail)))
     console.log(colors)
 
+    
     // audio
     await Promise.all(items.map(({id, video}) => processVideo(id, video)))
 
