@@ -4,18 +4,14 @@ import Track from '../models/track.js'
 const getAllTracks = async () => {
 
 }
-const insertTrack = async ({id, artist = '', title = '', media_file = '', thumbnail = '', main_color = 'ffffff'}) => {
-    const tracks = [
-        {id, artist, title, media_file, thumbnail, main_color}
-    ]
-
+const insertTracks = async (tracks = []) => {
     try{
-        await Track.insertMany(tracks)
+        await Track.updateMany(tracks, {upsert: true})
         console.log('success to insert')
     }catch(err){
-        throw new Error('failed to insert' + err.message)
+        throw new Error('failed to insert: ' + err.message)
     }
 }
 
 
-export {getAllTracks, insertTrack}
+export {getAllTracks, insertTracks}

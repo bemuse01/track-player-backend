@@ -25,14 +25,20 @@ const download = (cmd) => {
     })
 }
 
-const processVideo = async () => {
+const processVideo = async (id, url) => {
+    try{
 
-    const url = 'https://www.youtube.com/watch?v=PiIAVnFX2eo'
-    const id = 'PiIAVnFX2eo'
-    const command = `yt-dlp --extract-audio --audio-format mp3 -o "${AUDIO_SAVE_PATH}${id}.%(ext)s" ${url}`
+        const command = `yt-dlp --extract-audio --audio-format mp3 -o "${AUDIO_SAVE_PATH}${id}.%(ext)s" ${url}`
 
-    await download(command)
+        await download(command)
 
+    }catch(err){
+
+        console.log(err)
+        throw new Error(err.message)
+
+    }
 }
 
-processVideo()
+
+export default processVideo

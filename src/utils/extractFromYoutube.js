@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import { PLAYLIST_ID } from '../config/urls.js'
+import { PLAYLIST_ID, YOUTUBE_BASE_URL } from '../config/urls.js'
 import 'dotenv/config'
 
 const youtube = google.youtube({
@@ -17,7 +17,7 @@ const getPlaylistInfo = async () => {
 
         const {title} = response.data.items[0].snippet
 
-        return {title}
+        return {artist: title}
 
     }catch(err){
 
@@ -43,10 +43,11 @@ const getPlaylistItems = async () => {
             
             const items = response.data.items.map(item => {
                 const {title, thumbnails, resourceId} = item.snippet
-                const {url} = thumbnails.maxres
-                const {videoId} = resourceId
+                const thumbnail = thumbnails.maxres.url
+                const id = resourceId.videoId
+                const video = YOUTUBE_BASE_URL + id
 
-                return {title, thumbnail: url, id: videoId}
+                return {title, thumbnail, id, video}
             })
             listItems.push(...items)
             
@@ -58,6 +59,7 @@ const getPlaylistItems = async () => {
 
     }catch(err){
 
+        console.log(err)
         throw new Error(err.message)
 
     }
@@ -66,15 +68,16 @@ const getPlaylistItems = async () => {
 const extractFromYoutube = async () => {
     try{
         
-        const {title} = await getPlaylistInfo()
+        const {artist} = await getPlaylistInfo()
         const items = await getPlaylistItems()
 
-        console.log(title, items)
+        // console.log(title, items)
 
-        return {title, items}
+        return {artist, items}
 
     }catch(err){
 
+        console.log(err)
         throw new Error(err.message)
 
     }
