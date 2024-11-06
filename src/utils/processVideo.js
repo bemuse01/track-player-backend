@@ -1,4 +1,5 @@
 import { AUDIO_SAVE_PATH } from '../config/urls.js'
+import { AUDIO_FORMAT } from '../config/file.js'
 import { exec } from 'child_process'
 
 
@@ -28,9 +29,13 @@ const download = (cmd) => {
 const processVideo = async (id, url) => {
     try{
 
-        const command = `yt-dlp --extract-audio --audio-format mp3 -o "${AUDIO_SAVE_PATH}${id}.%(ext)s" ${url}`
+        const savePath = `${AUDIO_SAVE_PATH}${id}.${AUDIO_FORMAT}`
+
+        const command = `yt-dlp --extract-audio --audio-format ${AUDIO_FORMAT} -o "${savePath}" ${url}`
 
         await download(command)
+
+        return savePath
 
     }catch(err){
 

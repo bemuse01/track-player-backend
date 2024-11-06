@@ -1,7 +1,7 @@
 import sharp from 'sharp'
 import axios from 'axios'
 import { IMAGE_SAVE_PATH } from '../config/urls.js'
-import { getColor } from 'colorthief'
+import { IMAGE_FORMAT } from '../config/file.js'
 import _ from 'lodash'
 
 
@@ -67,11 +67,11 @@ const processImage = async (id, url) => {
 
 
         // save
-        const savePath = IMAGE_SAVE_PATH + id + '.jpg'
+        const savePath = IMAGE_SAVE_PATH + id + '.' + IMAGE_FORMAT
         await croppedImage.toFile(savePath)
         
 
-        return {main_color: hex}
+        return {main_color: hex, savePath}
 
     }catch(err){
 

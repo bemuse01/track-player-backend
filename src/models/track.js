@@ -7,6 +7,7 @@ const trackSchema = new mongoose.Schema({
     media_file: {type: String, required: true, trim: true},
     thumbnail: {type: String, required: true, trim: true},
     main_color: {type: String, default: 'ffffff', trim: true},
+    playlist_name: {type: String, required: true, trime: true}
 })
 trackSchema.set('timestamps', {createdAt: 'created_at', updatedAt: 'updated_at'})
 

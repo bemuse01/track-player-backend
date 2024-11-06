@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import { PLAYLIST_ID, YOUTUBE_BASE_URL } from '../config/urls.js'
+import { YOUTUBE_BASE_URL } from '../config/urls.js'
 import 'dotenv/config'
 
 const youtube = google.youtube({
@@ -7,17 +7,17 @@ const youtube = google.youtube({
     auth: process.env.YOUTUBE_API_KEY
 })
 
-const getPlaylistInfo = async () => {
+const getPlaylistInfo = async (playlist_id) => {
     try{
 
         const response = await youtube.playlists.list({
             part: 'snippet',
-            id: PLAYLIST_ID,
+            id: playlist_id,
         })
 
         const {title} = response.data.items[0].snippet
 
-        return {artist: title}
+        return {playlist_name: title}
 
     }catch(err){
 
@@ -26,7 +26,7 @@ const getPlaylistInfo = async () => {
     }
 }
 
-const getPlaylistItems = async () => {
+const getPlaylistItems = async (playlist_id) => {
     try{
 
         let nextPageToken = ''
@@ -36,18 +36,18 @@ const getPlaylistItems = async () => {
 
             const response = await youtube.playlistItems.list({
                 part: 'snippet',
-                playlistId: PLAYLIST_ID,
+                playlistId: playlist_id,
                 maxResults: 50,
                 pageToken: nextPageToken
             })
             
             const items = response.data.items.map(item => {
-                const {title, thumbnails, resourceId} = item.snippet
+                const {artist, title, thumbnails, resourceId} = item.snippet
                 const thumbnail = thumbnails.maxres.url
                 const id = resourceId.videoId
                 const video = YOUTUBE_BASE_URL + id
 
-                return {title, thumbnail, id, video}
+                return {title, artist, thumbnail, id, video}
             })
             listItems.push(...items)
             
@@ -65,15 +65,15 @@ const getPlaylistItems = async () => {
     }
 }
 
-const extractFromYoutube = async () => {
+const extractFromYoutube = async (playlist_id) => {
     try{
         
-        const {artist} = await getPlaylistInfo()
-        const items = await getPlaylistItems()
+        const {playlist_name} = await getPlaylistInfo(playlist_id)
+        const items = await getPlaylistItems(playlist_id)
 
         // console.log(title, items)
 
-        return {artist, items}
+        return {playlist_name, items}
 
     }catch(err){
 
