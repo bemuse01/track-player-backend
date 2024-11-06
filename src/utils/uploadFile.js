@@ -1,20 +1,16 @@
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob'
+import { BlobServiceClient } from '@azure/storage-blob'
 import { DefaultAzureCredential } from '@azure/identity'
-import {v1 as uuidv1} from 'uuid'
 import 'dotenv/config'
 
 
-const blobServiceClient = new BlobServiceClient(
-    `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
-    new DefaultAzureCredential()
-)
+const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECT_URI)
 
 const createContainer = async (containerName) => {
     try{
         const containerClient = blobServiceClient.getContainerClient(containerName)
-        const {succeeded} = await containerClient.createIfNotExists()
+        await containerClient.createIfNotExists({access: 'blob'})
 
-        if(!succeeded) throw new Error('cannot create container')
+        // if(!succeeded) throw new Error('container already exists')
 
     }catch(err){
 
@@ -23,30 +19,46 @@ const createContainer = async (containerName) => {
     }
 }
 
-const uploadBlob = () => {
+const uploadBlob = async blob => {
     try{
 
+        const {localPath, blobName, containerName} = blob
+        const containerClient = blobServiceClient.getContainerClient(containerName)
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName)
 
-
+        await blockBlobClient.uploadFile(localPath)
 
     }catch(err){
+
+        console.log(err)
+        throw new Error(err.message, err)
 
     }
 }
 
-const upload = async () => {
+const uploadFile = async (blobs) => {
     try{
 
         await createContainer(process.env.THUMBNAIL_CONTAINER_NAME)
         await createContainer(process.env.AUDIO_CONTAINER_NAME)
 
-        console.log(response)
+        // const blobs = [
+        //     {
+        //         localPath: './src/assets/images/maxresdefault.jpg',
+        //         blobName: 'maxresdefault.jpg',
+        //         containerName: process.env.THUMBNAIL_CONTAINER_NAME
+        //     }
+        // ]
+
+        await Promise.all(blobs.map(blob => uploadBlob(blob)))
 
     }catch(err){
 
-        console.log(err.message)
+        console.log(err)
+        throw new Error(err.message)
 
     }
 }
 
-upload()
+
+export default uploadFile

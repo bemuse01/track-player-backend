@@ -9,8 +9,15 @@ const doWork = async item => {
 
         const {id, thumbnail, video} = item
 
+        // create and save image, audio file
         const {main_color, savePath: localImagePath} = await processImage(id, thumbnail)
         const localAudioPath = await processVideo(id, video)
+
+
+        // upload to storage
+
+
+        // delete local file
         await deleteLocalFile([localImagePath, localAudioPath])
 
         return {main_color}
