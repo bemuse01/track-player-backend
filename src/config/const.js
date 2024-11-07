@@ -1,0 +1,3 @@
+const PROMISE_BATCH_SIZE = 10
+
+export {PROMISE_BATCH_SIZE}

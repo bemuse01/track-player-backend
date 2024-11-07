@@ -19,14 +19,17 @@ const createContainer = async (containerName) => {
     }
 }
 
-const uploadBlob = async blob => {
+const uploadBlob = async ({containerName, blobName, localPath}) => {
     try{
 
-        const {localPath, blobName, containerName} = blob
         const containerClient = blobServiceClient.getContainerClient(containerName)
-        const blockBlobClient = containerClient.getBlockBlobClient(blobName)
+        const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
 
         await blockBlobClient.uploadFile(localPath)
+
+        const url = blockBlobClient.url
+
+        return url
 
     }catch(err){
 
@@ -36,21 +39,24 @@ const uploadBlob = async blob => {
     }
 }
 
-const uploadFile = async (blobs) => {
+const getBlobUrl = () => {
+    
+}
+
+const uploadFile = async (blob) => {
     try{
 
-        await createContainer(process.env.THUMBNAIL_CONTAINER_NAME)
-        await createContainer(process.env.AUDIO_CONTAINER_NAME)
+        // const blobName = 'maxresDefault.jpg'
+        // const containerName = process.env.THUMBNAIL_CONTAINER_NAME
+        // const localPath = './src/assets/images/maxresdefault.jpg'
 
-        // const blobs = [
-        //     {
-        //         localPath: './src/assets/images/maxresdefault.jpg',
-        //         blobName: 'maxresdefault.jpg',
-        //         containerName: process.env.THUMBNAIL_CONTAINER_NAME
-        //     }
-        // ]
+        // const blob = {blobName, containerName, localPath}
+ 
+        await createContainer(containerName)
 
-        await Promise.all(blobs.map(blob => uploadBlob(blob)))
+        const url = await uploadBlob(blob)
+
+        console.log(url)
 
     }catch(err){
 
@@ -61,4 +67,5 @@ const uploadFile = async (blobs) => {
 }
 
 
-export default uploadFile
+// export default uploadFile
+uploadFile()

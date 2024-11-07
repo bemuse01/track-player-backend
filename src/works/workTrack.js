@@ -1,7 +1,8 @@
+import { PLAYLIST_IDS } from '../config/urls.js'
+import { PROMISE_BATCH_SIZE } from '../config/const.js'
 import extractFromYoutube from '../utils/extractFromYoutube.js'
 import processImage from '../utils/processImage.js'
 import processVideo from '../utils/processVideo.js'
-import { PLAYLIST_IDS } from '../config/urls.js'
 import deleteLocalFile from '../utils/deleteLocalFile.js'
 
 const doWork = async item => {
@@ -9,7 +10,7 @@ const doWork = async item => {
 
         const {id, thumbnail, video} = item
 
-        // create and save image, audio file
+        // create and save image, audio file on local
         const {main_color, savePath: localImagePath} = await processImage(id, thumbnail)
         const localAudioPath = await processVideo(id, video)
 
@@ -34,7 +35,17 @@ const createAllData = async playlist_id => {
     try{
         const {playlist_name, items} = await extractFromYoutube(playlist_id)
 
-        const info = await Promise.all(items.map(item => doWork(item)))
+        const promiseArray = []
+        const batchSize = PROMISE_BATCH_SIZE
+
+        for(let i = 0; i < items.length; i += batchSize){
+            const batch = items.slice(i, i + batchSize).map(item => doWork(item))
+            promiseArray.push(await Promise.all(batch))
+            console.log('batch length: ', promiseArray.length)
+        }
+
+        const info = (await Promise.all(promiseArray)).flat()
+        console.log(info)
 
     }catch(err){
         console.log(err)
