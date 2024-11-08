@@ -1,4 +1,4 @@
-import { insertTrack } from '../controllers/trackControllers.js'
+import { insertTracks } from '../controllers/trackControllers.js'
 
 const trackShema = {
     querystring: {

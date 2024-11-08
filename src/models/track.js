@@ -1,13 +1,13 @@
 import mongoose from 'mongoose'
 
 const trackSchema = new mongoose.Schema({
-    id: {type: String, required: true, unique: true, trim: true},
+    track_id: {type: String, required: true, unique: true, trim: true},
     artist: {type: String, default: '', trim: true},
     title: {type: String, default: '', trim: true},
-    media_file: {type: String, required: true, trim: true},
-    thumbnail: {type: String, required: true, trim: true},
+    audio_url: {type: String, required: true, trim: true},
+    thumbnail_url: {type: String, required: true, trim: true},
     main_color: {type: String, default: 'ffffff', trim: true},
-    playlist_name: {type: String, required: true, trime: true}
+    playlist: {type: mongoose.Types.ObjectId, required: true, ref: 'Playlist'},
 })
 trackSchema.set('timestamps', {createdAt: 'created_at', updatedAt: 'updated_at'})
 

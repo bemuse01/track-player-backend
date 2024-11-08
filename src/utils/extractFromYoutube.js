@@ -1,23 +1,19 @@
-import { google } from 'googleapis'
 import { YOUTUBE_BASE_URL } from '../config/urls.js'
 import 'dotenv/config'
 
-const youtube = google.youtube({
-    version: 'v3',
-    auth: process.env.YOUTUBE_API_KEY
-})
-
-const getPlaylistInfo = async (playlist_id) => {
+const getPlaylistInfo = async (youtube, pid) => {
     try{
 
         const response = await youtube.playlists.list({
             part: 'snippet',
-            id: playlist_id,
+            id: pid,
         })
 
-        const {title} = response.data.items[0].snippet
+        const item = response.data.items[0]
+        const playlist_id = item.id
+        const {title} = item.snippet
 
-        return {playlist_name: title}
+        return {playlist_name: title, playlist_id}
 
     }catch(err){
 
@@ -26,7 +22,7 @@ const getPlaylistInfo = async (playlist_id) => {
     }
 }
 
-const getPlaylistItems = async (playlist_id) => {
+const getPlaylistItems = async (youtube, pid) => {
     try{
 
         let nextPageToken = ''
@@ -36,18 +32,19 @@ const getPlaylistItems = async (playlist_id) => {
 
             const response = await youtube.playlistItems.list({
                 part: 'snippet',
-                playlistId: playlist_id,
+                playlistId: pid,
                 maxResults: 50,
                 pageToken: nextPageToken
             })
             
             const items = response.data.items.map(item => {
-                const {artist, title, thumbnails, resourceId} = item.snippet
-                const thumbnail = thumbnails.maxres.url
-                const id = resourceId.videoId
-                const video = YOUTUBE_BASE_URL + id
+                const {videoOwnerChannelTitle, title, thumbnails, resourceId} = item.snippet
+                const artist = videoOwnerChannelTitle.split('-')[0].trim()
+                const thumbnailUrl = thumbnails.maxres.url
+                const track_id = resourceId.videoId
+                const videoUrl = YOUTUBE_BASE_URL + track_id
 
-                return {title, artist, thumbnail, id, video}
+                return {title, artist, thumbnailUrl, track_id, videoUrl}
             })
             listItems.push(...items)
             
@@ -65,15 +62,15 @@ const getPlaylistItems = async (playlist_id) => {
     }
 }
 
-const extractFromYoutube = async (playlist_id) => {
+const extractFromYoutube = async (youtube, pid) => {
     try{
         
-        const {playlist_name} = await getPlaylistInfo(playlist_id)
-        const items = await getPlaylistItems(playlist_id)
+        const {playlist_name, playlist_id} = await getPlaylistInfo(youtube, pid)
+        const items = await getPlaylistItems(youtube, pid)
 
         // console.log(title, items)
 
-        return {playlist_name, items}
+        return {playlist_name, playlist_id, items}
 
     }catch(err){
 

@@ -1,11 +1,7 @@
-import { BlobServiceClient } from '@azure/storage-blob'
-import { DefaultAzureCredential } from '@azure/identity'
 import 'dotenv/config'
 
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECT_URI)
-
-const createContainer = async (containerName) => {
+const createContainer = async (blobServiceClient, containerName) => {
     try{
         const containerClient = blobServiceClient.getContainerClient(containerName)
         await containerClient.createIfNotExists({access: 'blob'})
@@ -19,7 +15,7 @@ const createContainer = async (containerName) => {
     }
 }
 
-const uploadBlob = async ({containerName, blobName, localPath}) => {
+const uploadBlob = async (blobServiceClient, {containerName, blobName, localPath}) => {
     try{
 
         const containerClient = blobServiceClient.getContainerClient(containerName)
@@ -39,11 +35,7 @@ const uploadBlob = async ({containerName, blobName, localPath}) => {
     }
 }
 
-const getBlobUrl = () => {
-    
-}
-
-const uploadFile = async (blob) => {
+const uploadFile = async (blobServiceClient, blob) => {
     try{
 
         // const blobName = 'maxresDefault.jpg'
@@ -52,11 +44,13 @@ const uploadFile = async (blob) => {
 
         // const blob = {blobName, containerName, localPath}
  
-        await createContainer(containerName)
+        await createContainer(blobServiceClient, containerName)
 
-        const url = await uploadBlob(blob)
+        const url = await uploadBlob(blobServiceClient, blob)
 
         console.log(url)
+
+        return url
 
     }catch(err){
 
@@ -67,5 +61,4 @@ const uploadFile = async (blob) => {
 }
 
 
-// export default uploadFile
-uploadFile()
+export default uploadFile
