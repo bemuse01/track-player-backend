@@ -1,4 +1,6 @@
 import { YOUTUBE_BASE_URL } from '../config/urls.js'
+import { ARTIST_REGEX } from '../config/config.js'
+import { replaceText } from './helper.js'
 import 'dotenv/config'
 
 const getPlaylistInfo = async (youtube, pid) => {
@@ -17,7 +19,7 @@ const getPlaylistInfo = async (youtube, pid) => {
 
     }catch(err){
 
-        throw new Error(err.message)
+        console.log(err)
 
     }
 }
@@ -39,10 +41,12 @@ const getPlaylistItems = async (youtube, pid) => {
             
             const items = response.data.items.map(item => {
                 const {videoOwnerChannelTitle, title, thumbnails, resourceId} = item.snippet
-                const artist = videoOwnerChannelTitle.split('-')[0].trim()
+                const artist = replaceText(ARTIST_REGEX, videoOwnerChannelTitle, ' ').trim()
                 const thumbnailUrl = thumbnails.maxres.url
                 const track_id = resourceId.videoId
                 const videoUrl = YOUTUBE_BASE_URL + track_id
+
+                console.log(artist, videoOwnerChannelTitle)
 
                 return {title, artist, thumbnailUrl, track_id, videoUrl}
             })
@@ -57,7 +61,6 @@ const getPlaylistItems = async (youtube, pid) => {
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message)
 
     }
 }
@@ -75,7 +78,6 @@ const extractFromYoutube = async (youtube, pid) => {
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message)
 
     }
 }

@@ -40,7 +40,6 @@ const processVideo = async (id, url) => {
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message, err)
 
     }
 }

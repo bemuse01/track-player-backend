@@ -6,6 +6,8 @@ import processVideo from './processVideo.js'
 import uploadFile from './uploadFile.js'
 import deleteLocalFile from './deleteLocalFile.js'
 import { insertOrFindPlaylist } from '../controllers/playlistController.js'
+import { deleteTracks, getAllTracksByPlaylistId, insertOrUpdateTracks } from '../controllers/trackControllers.js'
+import _ from 'lodash'
 
 
 class TrackWorker{
@@ -22,8 +24,7 @@ class TrackWorker{
 
     // insert and upload tracks, playlist
     async insert(){
-        const tracks = await Promise.all(this.playlistIds.map(async pid => this.insertPlaylistAndTracks(pid)))
-        console.log(tracks)
+        await Promise.all(this.playlistIds.map(async pid => this.insertPlaylistAndTracks(pid)))
         console.log('done')
     }
     async insertPlaylistAndTracks(pid){
@@ -33,9 +34,7 @@ class TrackWorker{
             const {playlist_name, playlist_id, items} = await extractFromYoutube(youtube, pid)
 
             const playlistObjectId = await this.insertPlaylist(playlist_id, playlist_name, items)
-            const tracks = await this.insertTracks(playlistObjectId, items)
-
-            return tracks
+            await this.insertTracks(playlistObjectId, items)
 
         }catch(err){
 
@@ -48,14 +47,13 @@ class TrackWorker{
         try{
 
             const track_order = items.map(item => item.track_id)
-            const playlist = {playlist_id, playlist_name, track_order}
+            const playlist = {_id: playlist_id, playlist_name, track_order}
             const {_id} = await insertOrFindPlaylist(playlist_id, playlist)
             return _id
 
         }catch(err){
 
             console.log(err)
-            throw new Error(err.message)
 
         }
     }
@@ -74,12 +72,11 @@ class TrackWorker{
     
             const tracks = (await Promise.all(promiseArray)).flat().map(item => ({...item, playlist: playlistObjectId}))
 
-            return tracks
+            insertOrUpdateTracks(tracks)
     
         }catch(err){
 
             console.log(err)
-            throw new Error(err.message)
 
         }
     }
@@ -92,37 +89,67 @@ class TrackWorker{
 
             // create and save image, audio file on local
             const {main_color, savePath: localImagePath} = await processImage(track_id, thumbnailUrl)
-            const localAudioPath = await processVideo(track_id, videoUrl)
+            // const localAudioPath = await processVideo(track_id, videoUrl)
     
     
             // upload blob to storage
-            const blobs = [
-                {
-                    localPath: localImagePath,
-                    containerName: process.env.THUMBNAIL_CONTAINER_NAME,
-                    blobName: localImagePath.split('/').pop()
-                },
-                {
-                    localPath: localAudioPath,
-                    containerName: process.env.AUDIO_CONTAINER_NAME,
-                    blobName: localAudioPath.split('/').pop()
-                }
-            ]
+            // const blobs = [
+            //     {
+            //         localPath: localImagePath,
+            //         containerName: process.env.THUMBNAIL_CONTAINER_NAME,
+            //         blobName: localImagePath.split('/').pop()
+            //     },
+            //     {
+            //         localPath: localAudioPath,
+            //         containerName: process.env.AUDIO_CONTAINER_NAME,
+            //         blobName: localAudioPath.split('/').pop()
+            //     }
+            // ]
             // const [thumbnail_url, audio_url] = await Promise.all(blobs.map(blob => uploadFile(blobServiceClient, blob)))
     
     
             // delete local file
-            await deleteLocalFile([localImagePath, localAudioPath])
+            // await deleteLocalFile([localImagePath, localAudioPath])
+            await deleteLocalFile([localImagePath])
     
     
-            return {track_id, artist, title, main_color, thumbnail_url: '', audio_url: ''}
+            return {_id: track_id, artist, title, main_color, thumbnail_url: 'test', audio_url: 'test'}
     
         }catch(err){
     
             console.log(err)
-            throw new Error(err.message)
     
         }
+    }
+
+
+
+    // delete tracks not in youtube playlist
+    async delete(){
+        await Promise.all(this.playlistIds.map(async pid => this.deleteWorks(pid)))
+        console.log('done')
+    }
+    async deleteWorks(pid){
+        try{
+
+            const {youtube} = this
+            const {playlist_id, playlist_name, items} = await extractFromYoutube(youtube, pid)
+
+            await this.insertPlaylist(playlist_id, playlist_name, items)
+            await this.deleteTracks(playlist_id, items)
+            
+        }catch(err){
+
+            console.log(err)
+
+        }
+    }
+    async deleteTracks(pid, items){
+        const tracksInYT = items.map(item => item.track_id)
+        const tracksInDB = (await getAllTracksByPlaylistId(pid)).map(item => item._id)
+        const tracksToDelete = _.difference(tracksInDB, tracksInYT)
+
+        deleteTracks(tracksToDelete)
     }
 
 

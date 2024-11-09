@@ -4,7 +4,7 @@ import Playlist from '../models/playlist.js'
 const insertOrFindPlaylist = async (playlistId, playlist) => {
     try{
 
-        const query = {playlist_id: playlistId}
+        const query = {_id: playlistId}
         const option = {upsert: true, new: true}
 
         const result = await Playlist.findOneAndUpdate(query, playlist, option)

@@ -9,7 +9,6 @@ const deleteFile = async (path) => {
     }catch(err){
         
         console.log(err)
-        throw new Error(err.message)
 
     }
 }
@@ -22,7 +21,6 @@ const deleteLocalFile = async (paths) => {
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message)
 
     }
 }

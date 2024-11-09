@@ -10,7 +10,7 @@ const createContainer = async (blobServiceClient, containerName) => {
 
     }catch(err){
 
-        console.error(err.message, err)
+        console.log(err)
 
     }
 }
@@ -30,7 +30,6 @@ const uploadBlob = async (blobServiceClient, {containerName, blobName, localPath
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message, err)
 
     }
 }
@@ -55,7 +54,6 @@ const uploadFile = async (blobServiceClient, blob) => {
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message)
 
     }
 }

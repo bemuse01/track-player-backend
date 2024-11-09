@@ -1,27 +1,45 @@
+import mongoose from 'mongoose'
 import Track from '../models/track.js'
 
 
 const getAllTracksByPlaylistId = async (playlistId) => {
-
-}
-
-const insertTracks = async (tracks = []) => {
     try{
 
-        await Track.updateMany(tracks, {upsert: true})
-        console.log('success to insert')
+        const query = {playlist: playlistId}
+        const tracks = await Track.find(query)
+
+        return tracks
 
     }catch(err){
 
         console.log(err)
-        throw new Error(err.message)
 
     }
 }
 
-const deleteTracks = async (tracks = []) => {
+const insertOrUpdateTracks = async (tracks = []) => {
+    try{
 
+        await Track.insertMany(tracks, {ordered: false})
+        console.log('success to insert')
+
+    }catch(err){
+
+        console.error(err.message, err)
+
+    }
+}
+
+const deleteTracks = async (trackIds = []) => {
+    try{
+        const query = {_id: {$in: trackIds}}
+        await Track.deleteMany(query)
+    }catch(err){
+
+        console.error(err.message, err)
+
+    }
 }
 
 
-export {getAllTracksByPlaylistId, insertTracks}
+export {getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks}

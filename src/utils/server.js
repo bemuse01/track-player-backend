@@ -75,7 +75,7 @@ class Server{
     onReady(err){
         if(err) throw new Error(err.message, err)
         const trackWorker = this.fastify.diContainer.resolve('trackWorker')
-        trackWorker.insert()
+        trackWorker.delete()
         // console.log(trackWorker.insertPlaylist)
         // const scheduler = this.fastify.diContainer.resolve('scheduler')
         // console.log(scheduler.dispose)

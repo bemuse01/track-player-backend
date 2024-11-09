@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const playlistSchema = new mongoose.Schema({
-    playlist_id: {type: String, required: true, unique: true, trim: true},
+    _id: {type: String, required: true, trim: true},
     playlist_name: {type: String, required: true, trime: true},
     track_order: {type: Array, default: []}
 })
