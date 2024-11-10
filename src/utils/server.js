@@ -5,9 +5,10 @@ import dbConnector from '../plugins/dbConnector.js'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import youtubeApi from '../plugins/youtubeApi.js'
-import azureStorage from '../plugins/azureStorage.js'
+// import testPlugin from '../plugins/testplugin.js'
 import Scheduler from './scheduler.js'
 import TrackWorker from './trackWorker.js'
+import Storage from './storage.js'
 import 'dotenv/config'
 
 
@@ -37,7 +38,7 @@ class Server{
     async registerDependencies(){
         this.fastify.register(dbConnector)
         this.fastify.register(youtubeApi)
-        this.fastify.register(azureStorage)
+        // this.fastify.register(azureStorage)
         this.fastify.register(fastifyAwilixPlugin, { disposeOnClose: true, disposeOnResponse: true, strictBooleanEnforced: true })
     }
     // routes
@@ -49,14 +50,18 @@ class Server{
 
     // awilix container
     registerContainer(){
-        const {fastify} = this
-
         diContainer.register({
             fastify: asValue(this.fastify),
-            trackWorker: asClass(TrackWorker, {
+            storage: asClass(Storage, {
                 lifetime: Lifetime.SINGLETON,
-                dispose: module => module.dispose(),
-            }).inject(() => ({fastify})),
+            }),
+            trackWorker: asFunction(
+                ({fastify, storage}) => new TrackWorker({fastify, storage}), 
+                {
+                    lifetime: Lifetime.SINGLETON,
+                    dispose: module => module.dispose(),
+                }
+            ),
             scheduler: asFunction(
                 ({trackWorker}) => new Scheduler(trackWorker), 
                 {
@@ -74,8 +79,9 @@ class Server{
     }
     onReady(err){
         if(err) throw new Error(err.message, err)
+        // console.log(JSON.parse(process.env.CONTAINER_NAME))
         const trackWorker = this.fastify.diContainer.resolve('trackWorker')
-        trackWorker.delete()
+        trackWorker.doWork()
         // console.log(trackWorker.insertPlaylist)
         // const scheduler = this.fastify.diContainer.resolve('scheduler')
         // console.log(scheduler.dispose)

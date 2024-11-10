@@ -46,7 +46,7 @@ const getPlaylistItems = async (youtube, pid) => {
                 const track_id = resourceId.videoId
                 const videoUrl = YOUTUBE_BASE_URL + track_id
 
-                console.log(artist, videoOwnerChannelTitle)
+                console.log(artist, ', ', videoOwnerChannelTitle)
 
                 return {title, artist, thumbnailUrl, track_id, videoUrl}
             })

@@ -20,7 +20,15 @@ const getAllTracksByPlaylistId = async (playlistId) => {
 const insertOrUpdateTracks = async (tracks = []) => {
     try{
 
-        await Track.insertMany(tracks, {ordered: false})
+        const queries = tracks.map(track => ({
+            updateOne: {
+                filter: {_id: track._id},
+                update: {$set: {...track}},
+                upsert: true
+            }
+        }))
+
+        await Track.bulkWrite(queries)
         console.log('success to insert')
 
     }catch(err){

@@ -43,7 +43,7 @@ const uploadFile = async (blobServiceClient, blob) => {
 
         // const blob = {blobName, containerName, localPath}
  
-        await createContainer(blobServiceClient, containerName)
+        await createContainer(blobServiceClient, blob.containerName)
 
         const url = await uploadBlob(blobServiceClient, blob)
 

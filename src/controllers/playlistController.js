@@ -5,13 +5,9 @@ const insertOrFindPlaylist = async (playlistId, playlist) => {
     try{
 
         const query = {_id: playlistId}
-        const option = {upsert: true, new: true}
+        const option = {upsert: true}
 
-        const result = await Playlist.findOneAndUpdate(query, playlist, option)
-
-        console.log(result)
-
-        return result
+        await Playlist.findOneAndUpdate(query, playlist, option)
 
     }catch(err){
 
