@@ -1,49 +1,76 @@
 // import { insertOrUpdateTracks } from '../controllers/trackControllers.js'
 
-const trackShema = {
+
+// post
+const getShema = {
     querystring: {
         type: 'object',
         properties: {
-            artist: {type: 'string', default: 'kessoku band'},
-            title: {type: 'string', default: ''}
+            // playlistId: {type: 'string'},
         }
     },
     response: {
         200: {
             type: 'object',
             properties: {
-                // id: {type: 'string'},
-                // arist: {type: 'string'},
-                // title: {type: 'string'},
-                // main_color: {type: 'string'},
+                test: {type: 'string'}
             }
         }
     }
 }
-const trackHandler = async (request, reply) => {
+const getHandler = async (request, reply) => {
     // const {artist, title} = request.query
-
-    // const id = Math.random().toString()
-    // const media_file = 'media_file_url'
-    // const thumbnail = 'thumbnail_url'
-    // const main_color = Math.floor(Math.random() * 255 * 255 * 255).toString(16)
-    // const data = {id, artist, title, media_file, thumbnail, main_color}
-
-    // try{
-    //     await insertTrack(data)
-    // }catch(err){
-    //     console.log(err)        
-    // }
-
-    // return {id, artist, title, main_color}
+    reply.send({test: 'get'})
 }
+const get = {
+    method: 'GET',
+    url: '/track',
+    schema: getShema,
+    handler: getHandler
+}
+
+
+// post
+const postSchema = {
+    body: {
+        type: 'object',
+        // required: ['playlistId'],
+        properties: {
+            // playlistId: {type: 'string'}
+        }
+    },
+    response: {
+        200: {
+            type: 'object',
+            properties: {
+                tracks: {type: 'array'}
+                // test: {type: 'string'}
+            }
+        }
+    }
+}
+const postHandler = async (request, reply) => {
+    const {playlistId} = request.params
+
+    console.log(playlistId)
+
+    reply.send({tracks: []})
+}
+const post = {
+    method: 'POST',
+    url: '/track/:playlistId',
+    schema: postSchema,
+    handler: postHandler
+}
+
+
 const track = async (fastify, options) => {
-    fastify.route({
-        method: 'GET',
-        url: '/track',
-        schema: trackShema,
-        handler: trackHandler
-    })
+
+    fastify.route(get)
+    
+    fastify.route(post)
+
 }
+
 
 export default track

@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import { fastifyAwilixPlugin, diContainer } from '@fastify/awilix'
 import { asClass, asFunction, asValue, Lifetime } from 'awilix'
+import fastifyFormbody from '@fastify/formbody'
 import dbConnector from '../plugins/dbConnector.js'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
@@ -36,6 +37,7 @@ class Server{
     }
     // dependencies
     async registerDependencies(){
+        this.fastify.register(fastifyFormbody)
         this.fastify.register(dbConnector)
         this.fastify.register(youtubeApi)
         // this.fastify.register(azureStorage)
@@ -80,8 +82,8 @@ class Server{
     onReady(err){
         if(err) throw new Error(err.message, err)
         // console.log(JSON.parse(process.env.CONTAINER_NAME))
-        const trackWorker = this.fastify.diContainer.resolve('trackWorker')
-        trackWorker.doWork()
+        // const trackWorker = this.fastify.diContainer.resolve('trackWorker')
+        // trackWorker.doWork()
         // console.log(trackWorker.insertPlaylist)
         // const scheduler = this.fastify.diContainer.resolve('scheduler')
         // console.log(scheduler.dispose)
