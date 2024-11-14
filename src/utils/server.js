@@ -5,6 +5,7 @@ import fastifyFormbody from '@fastify/formbody'
 import dbConnector from '../plugins/dbConnector.js'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
+import playlistRoute from '../routes/playlist.js'
 import youtubeApi from '../plugins/youtubeApi.js'
 // import testPlugin from '../plugins/testplugin.js'
 import Scheduler from './scheduler.js'
@@ -46,6 +47,7 @@ class Server{
     // routes
     registerRoutes(){
         this.fastify.register(rootRoute)
+        this.fastify.register(playlistRoute)
         this.fastify.register(trackRoute)
     }
 

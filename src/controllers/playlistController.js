@@ -1,5 +1,18 @@
 import Playlist from '../models/playlist.js'
 
+const getAllPlaylists = async () => {
+    try{
+
+        const playlists = await Playlist.find()
+
+        return playlists
+
+    }catch(err){
+
+        console.log(err)
+
+    }
+}
 
 const insertOrFindPlaylist = async (playlistId, playlist) => {
     try{
@@ -12,10 +25,9 @@ const insertOrFindPlaylist = async (playlistId, playlist) => {
     }catch(err){
 
         console.log(err)
-        throw new Error(err)
 
     }
 }
 
 
-export {insertOrFindPlaylist}
+export {insertOrFindPlaylist, getAllPlaylists}

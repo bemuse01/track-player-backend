@@ -1,7 +1,8 @@
-// import { insertOrUpdateTracks } from '../controllers/trackControllers.js'
+import { getAllTracksByPlaylistId } from '../controllers/trackControllers.js'
 
 
-// post
+
+// get
 const getShema = {
     querystring: {
         type: 'object',
@@ -30,6 +31,7 @@ const get = {
 }
 
 
+
 // post
 const postSchema = {
     body: {
@@ -44,7 +46,6 @@ const postSchema = {
             type: 'object',
             properties: {
                 tracks: {type: 'array'}
-                // test: {type: 'string'}
             }
         }
     }
@@ -54,7 +55,9 @@ const postHandler = async (request, reply) => {
 
     console.log(playlistId)
 
-    reply.send({tracks: []})
+    const tracks = await getAllTracksByPlaylistId(playlistId)
+
+    reply.send({tracks})
 }
 const post = {
     method: 'POST',
@@ -62,6 +65,7 @@ const post = {
     schema: postSchema,
     handler: postHandler
 }
+
 
 
 const track = async (fastify, options) => {
