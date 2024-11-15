@@ -1,19 +1,18 @@
 import { PROMISE_BATCH_SIZE } from '../config/config.js'
 import { PLAYLIST_IDS } from '../config/urls.js'
-import extractFromYoutube from './extractFromYoutube.js'
 import processImage from './processImage.js'
 import processVideo from './processVideo.js'
 import deleteLocalFile from './deleteLocalFile.js'
-import { insertOrFindPlaylist } from '../controllers/playlistController.js'
+import { insertOrUpdatePlaylist } from '../controllers/playlistController.js'
 import { deleteTracks, getAllTracksByPlaylistId, insertOrUpdateTracks } from '../controllers/trackControllers.js'
 import _ from 'lodash'
 import { AUDIO_FORMAT, IMAGE_FORMAT } from '../config/file.js'
 
 
 class TrackWorker{
-    constructor({fastify, storage}){
+    constructor({fastify, storage, youtube}){
         this.fastify = fastify
-        this.youtube = this.fastify.youtube
+        this.youtube = youtube
         this.storage = storage
 
         this.playlistIds = PLAYLIST_IDS
@@ -39,11 +38,16 @@ class TrackWorker{
     async insertWorks(pid){
         try{
 
-            const {youtube} = this
-            const {playlist_name, playlist_id, items} = await extractFromYoutube(youtube, pid)
 
-            await this.insertPlaylist(playlist_id, playlist_name, items)
-            await this.insertTracks(playlist_id, items)
+            // get playlist and tracks info from youtube
+            const {youtube} = this
+            const {playlistName, playlistId, items} = await youtube.getDataFromYoutube(pid)
+
+
+            // insert data to db
+            await this.insertPlaylist(playlistId, playlistName, items)
+            await this.insertTracks(playlistId, items)
+
 
         }catch(err){
 
@@ -52,12 +56,12 @@ class TrackWorker{
         }
     }
     // playlist
-    async insertPlaylist(playlist_id, playlist_name, items){
+    async insertPlaylist(playlistId, playlistName, items){
         try{
 
-            const track_order = items.map(item => item.track_id)
-            const playlist = {_id: playlist_id, playlist_name, track_order}
-            await insertOrFindPlaylist(playlist_id, playlist)
+            const track_order = items.map(item => item.videoId)
+            const playlist = {_id: playlistId, playlistName, track_order}
+            await insertOrUpdatePlaylist(playlistId, playlist)
 
         }catch(err){
 
@@ -66,11 +70,23 @@ class TrackWorker{
         }
     }
     // track
-    async insertTracks(playlist_id, items){
+    async insertTracks(playlistId, items){
         try{
-    
-            const tracks = await this.uploadTrackByBatch(playlist_id, items)
-            await insertOrUpdateTracks(tracks)
+            
+            const tracksInYT = items
+            const tracksInDB = await getAllTracksByPlaylistId(playlistId)
+            const tracksToInsert = _.differenceWith(tracksInYT, tracksInDB, (x, y) => x.videoId === y.track_id)
+
+            if(tracksToInsert.length === 0){
+                console.log('stop upload')
+                return
+            }
+            
+            console.log('upload track start')
+            console.log(tracksToInsert)
+
+            const tracks = await this.uploadTrackByBatch(playlistId, tracksToInsert)
+            await insertOrUpdateTracks(playlistId, tracks)
     
         }catch(err){
 
@@ -78,9 +94,11 @@ class TrackWorker{
 
         }
     }
-    async uploadTrackByBatch(playlist_id, items){
+    async uploadTrackByBatch(playlistId, items){
         try{
 
+
+            // process promises by batch 
             const {batchSize} = this
             const promises = []
 
@@ -95,7 +113,10 @@ class TrackWorker{
 
             }
 
-            const tracks = (await Promise.all(promises)).flat().map(item => ({...item, playlist: playlist_id}))
+
+            // wait all batch
+            const tracks = (await Promise.all(promises)).flat().map(item => ({...item, playlist: playlistId}))
+
 
             return tracks
 
@@ -108,12 +129,13 @@ class TrackWorker{
     async uploadTrack(item){
         try{
 
-            const {track_id, thumbnailUrl, videoUrl, artist, title} = item
+            const {storage} = this
+            const {videoId, thumbnailUrl, videoUrl, artist, title} = item
     
 
             // create and save image, audio file on local
-            const {main_color, savePath: localImagePath} = await processImage(track_id, thumbnailUrl)
-            const localAudioPath = await processVideo(track_id, videoUrl)
+            const {main_color, savePath: localImagePath} = await processImage(videoId, thumbnailUrl)
+            const localAudioPath = await processVideo(videoId, videoUrl)
     
     
             // upload blob to storage
@@ -129,14 +151,14 @@ class TrackWorker{
                     blobName: localAudioPath.split('/').pop()
                 }
             ]
-            const [thumbnail_url, audio_url] = await Promise.all(blobs.map(blob => this.storage.uploadBlob(blob)))
+            const [thumbnail_url, audio_url] = await Promise.all(blobs.map(blob => storage.uploadBlob(blob)))
     
     
             // delete local file
             await deleteLocalFile([localImagePath, localAudioPath])
     
     
-            return {_id: track_id, artist, title, main_color, thumbnail_url, audio_url}
+            return {track_id: videoId, artist, title, main_color, thumbnail_url, audio_url}
     
         }catch(err){
     
@@ -155,17 +177,21 @@ class TrackWorker{
     }
     async deleteWorks(pid){
         try{
-
+            
+            // filter tracks not in youtube playlist
             const {youtube} = this
-            const {playlist_id, playlist_name, items} = await extractFromYoutube(youtube, pid)
-            const trackIdsInYT = items.map(item => item.track_id)
-            const trackIdsInDB = (await getAllTracksByPlaylistId(pid)).map(item => item._id)
+            const {playlistId, playlistName, items} = await youtube.getDataFromYoutube(pid)
+            const trackIdsInYT = items.map(item => item.videoId)
+            const trackIdsInDB = (await getAllTracksByPlaylistId(pid)).map(item => item.track_id)
             const trackIdsToDelete = _.difference(trackIdsInDB, trackIdsInYT)
     
-            await this.insertPlaylist(playlist_id, playlist_name, items)
+
+            // update playlist track order
+            // delete tracks from db and storage
+            await this.insertPlaylist(playlistId, playlistName, items)
             await this.deleteTracksFromDB(trackIdsToDelete)
             await this.deleteTracksFromStorageByBatch(trackIdsToDelete)
-            
+
         }catch(err){
 
             console.log(err)
@@ -179,6 +205,7 @@ class TrackWorker{
     async deleteTracksFromStorageByBatch(trackIds){
         try{
 
+            // process promises by batch 
             const {batchSize} = this
             const promises = []
 
@@ -192,6 +219,8 @@ class TrackWorker{
 
             }
 
+
+            // wait all batch
             await Promise.all(promises)
 
         }catch(err){
@@ -202,6 +231,8 @@ class TrackWorker{
     }
     async deleteTracksFromStorage(trackId){
         try{
+
+            const {storage} = this
 
             const blobs = [
                 {
@@ -216,7 +247,7 @@ class TrackWorker{
 
             console.log(blobs)
 
-            await Promise.all(blobs.map(blob => this.storage.deleteBlob(blob)))
+            await Promise.all(blobs.map(blob => storage.deleteBlob(blob)))
 
         }catch(err){
 

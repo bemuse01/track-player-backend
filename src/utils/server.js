@@ -2,15 +2,14 @@ import Fastify from 'fastify'
 import { fastifyAwilixPlugin, diContainer } from '@fastify/awilix'
 import { asClass, asFunction, asValue, Lifetime } from 'awilix'
 import fastifyFormbody from '@fastify/formbody'
-import dbConnector from '../plugins/dbConnector.js'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import playlistRoute from '../routes/playlist.js'
-import youtubeApi from '../plugins/youtubeApi.js'
-// import testPlugin from '../plugins/testplugin.js'
+import dbConnector from '../plugins/dbConnector.js'
 import Scheduler from './scheduler.js'
 import TrackWorker from './trackWorker.js'
 import Storage from './storage.js'
+import Youtube from './youtube.js'
 import 'dotenv/config'
 
 
@@ -40,8 +39,6 @@ class Server{
     async registerDependencies(){
         this.fastify.register(fastifyFormbody)
         this.fastify.register(dbConnector)
-        this.fastify.register(youtubeApi)
-        // this.fastify.register(azureStorage)
         this.fastify.register(fastifyAwilixPlugin, { disposeOnClose: true, disposeOnResponse: true, strictBooleanEnforced: true })
     }
     // routes
@@ -56,11 +53,14 @@ class Server{
     registerContainer(){
         diContainer.register({
             fastify: asValue(this.fastify),
+            youtube: asClass(Youtube, {
+                lifetime: Lifetime.SINGLETON
+            }),
             storage: asClass(Storage, {
-                lifetime: Lifetime.SINGLETON,
+                lifetime: Lifetime.SINGLETON
             }),
             trackWorker: asFunction(
-                ({fastify, storage}) => new TrackWorker({fastify, storage}), 
+                ({fastify, storage, youtube}) => new TrackWorker({fastify, storage, youtube}), 
                 {
                     lifetime: Lifetime.SINGLETON,
                     dispose: module => module.dispose(),
@@ -84,8 +84,8 @@ class Server{
     onReady(err){
         if(err) throw new Error(err.message, err)
         // console.log(JSON.parse(process.env.CONTAINER_NAME))
-        // const trackWorker = this.fastify.diContainer.resolve('trackWorker')
-        // trackWorker.doWork()
+        const trackWorker = this.fastify.diContainer.resolve('trackWorker')
+        trackWorker.doWork()
         // console.log(trackWorker.insertPlaylist)
         // const scheduler = this.fastify.diContainer.resolve('scheduler')
         // console.log(scheduler.dispose)

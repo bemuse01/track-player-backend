@@ -14,7 +14,7 @@ const getAllPlaylists = async () => {
     }
 }
 
-const insertOrFindPlaylist = async (playlistId, playlist) => {
+const insertOrUpdatePlaylist = async (playlistId, playlist) => {
     try{
 
         const query = {_id: playlistId}
@@ -30,4 +30,4 @@ const insertOrFindPlaylist = async (playlistId, playlist) => {
 }
 
 
-export {insertOrFindPlaylist, getAllPlaylists}
+export {insertOrUpdatePlaylist, getAllPlaylists}

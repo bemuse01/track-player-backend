@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const trackSchema = new mongoose.Schema({
-    _id: {type: String, required: true, trim: true},
+    track_id: {type: String, required: true, trim: true},
     artist: {type: String, default: '', trim: true},
     title: {type: String, default: '', trim: true},
     audio_url: {type: String, required: true, trim: true},

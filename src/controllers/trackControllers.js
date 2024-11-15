@@ -16,12 +16,12 @@ const getAllTracksByPlaylistId = async (playlistId) => {
     }
 }
 
-const insertOrUpdateTracks = async (tracks = []) => {
+const insertOrUpdateTracks = async (playlist_id, tracks = []) => {
     try{
 
         const queries = tracks.map(track => ({
             updateOne: {
-                filter: {_id: track._id},
+                filter: {track_id: track.track_id, playlist: playlist_id},
                 update: {$set: {...track}},
                 upsert: true
             }
@@ -39,7 +39,7 @@ const insertOrUpdateTracks = async (tracks = []) => {
 
 const deleteTracks = async (trackIds = []) => {
     try{
-        const query = {_id: {$in: trackIds}}
+        const query = {track_id: {$in: trackIds}}
         await Track.deleteMany(query)
     }catch(err){
 
