@@ -51,7 +51,7 @@ class TrackQueue{
     // scheduler
     initScheduler(){
         this.schedulerOption = {
-            every: 5000,
+            every: 1000 * 60 * 60 * 6, // every 6 hours
             immediately: true
         }
         this.schedulerJobTemplate = {
