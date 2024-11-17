@@ -1,4 +1,5 @@
 import { Queue, Worker } from 'bullmq'
+import { createClient } from 'redis'
 import 'dotenv/config'
 
 
@@ -37,9 +38,24 @@ class TrackQueue{
 
     // init
     async init(){
+        // await this.initClient()
         this.initQueue()
         this.initScheduler()
         this.initWorker()
+    }
+
+
+    // client
+    async initClient(){
+        const {host, port, password} = this.connection
+
+        this.client = await createClient({
+            socket: {
+                host,
+                port
+            },
+            password
+        }).connect()
     }
 
 
