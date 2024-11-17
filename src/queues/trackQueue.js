@@ -16,13 +16,13 @@ const trackQueue = new Queue(queueName, {connection})
 
 
 // jobs
-const schedulerId = 'track-scheduler'
+const schedulerName = 'track-scheduler'
 const repeatOption = {
     every: 5000,
     immediately: true
 }
 const jobTemplate = (fastify) => ({
-    name: 'new-job',
+    name: 'track-job',
     data: {
         fastify,
         // msg: 'hello'
@@ -45,7 +45,7 @@ const trackWorker = new Worker(queueName, processor, {connection})
 const initTrackQueue = async (fastify) => {
     try{
         await trackQueue.obliterate()
-        await trackQueue.upsertJobScheduler(schedulerId, repeatOption, jobTemplate(fastify))
+        await trackQueue.upsertJobScheduler(schedulerName, repeatOption, jobTemplate(fastify))
     }catch(err){
         throw new Error(err.message)
     }

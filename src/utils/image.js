@@ -84,4 +84,4 @@ const processImage = async (id, url) => {
 }
 
 
-export default processImage
+export {processImage}

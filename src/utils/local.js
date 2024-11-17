@@ -25,4 +25,4 @@ const deleteLocalFile = async (paths) => {
     }
 }
 
-export default deleteLocalFile
+export {deleteLocalFile}

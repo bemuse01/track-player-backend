@@ -6,7 +6,7 @@ import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import playlistRoute from '../routes/playlist.js'
 import dbConnector from '../plugins/dbConnector.js'
-import Scheduler from './scheduler.js'
+import TrackQueue from './trackQueue.js'
 import TrackWorker from './trackWorker.js'
 import Storage from './storage.js'
 import Youtube from './youtube.js'
@@ -59,15 +59,15 @@ class Server{
             storage: asClass(Storage, {
                 lifetime: Lifetime.SINGLETON
             }),
-            trackWorker: asFunction(
-                ({fastify, storage, youtube}) => new TrackWorker({fastify, storage, youtube}), 
+            trackQeueu: asFunction(
+                ({trackWorker}) => new TrackQueue({trackWorker}),
                 {
                     lifetime: Lifetime.SINGLETON,
-                    dispose: module => module.dispose(),
+                    dispose: module => module.dispose()
                 }
             ),
-            scheduler: asFunction(
-                ({trackWorker}) => new Scheduler(trackWorker), 
+            trackWorker: asFunction(
+                ({fastify, storage, youtube}) => new TrackWorker({fastify, storage, youtube}), 
                 {
                     lifetime: Lifetime.SINGLETON,
                     dispose: module => module.dispose(),
@@ -86,9 +86,6 @@ class Server{
         // console.log(JSON.parse(process.env.CONTAINER_NAME))
         const trackWorker = this.fastify.diContainer.resolve('trackWorker')
         trackWorker.doWork()
-        // console.log(trackWorker.insertPlaylist)
-        // const scheduler = this.fastify.diContainer.resolve('scheduler')
-        // console.log(scheduler.dispose)
     }
     
 

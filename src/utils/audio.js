@@ -39,7 +39,7 @@ const download = (cmd, args) => {
     })
 }
 
-const processVideo = async (id, url) => {
+const processAudio = async (id, url) => {
     try{
 
         await mkdir(AUDIO_SAVE_PATH, {recursive: true})
@@ -61,4 +61,4 @@ const processVideo = async (id, url) => {
 }
 
 
-export default processVideo
+export {processAudio}

@@ -1,8 +1,8 @@
 import { PROMISE_BATCH_SIZE } from '../config/config.js'
 import { PLAYLIST_IDS } from '../config/urls.js'
-import processImage from './processImage.js'
-import processVideo from './processVideo.js'
-import deleteLocalFile from './deleteLocalFile.js'
+import { processImage } from './image.js'
+import { processAudio } from './audio.js'
+import { deleteLocalFile } from './local.js'
 import { insertOrUpdatePlaylist } from '../controllers/playlistController.js'
 import { deleteTracks, getAllTracksByPlaylistId, insertOrUpdateTracks } from '../controllers/trackControllers.js'
 import _ from 'lodash'
@@ -135,7 +135,7 @@ class TrackWorker{
 
             // create and save image, audio file on local
             const {main_color, savePath: localImagePath} = await processImage(videoId, thumbnailUrl)
-            const localAudioPath = await processVideo(videoId, videoUrl)
+            const localAudioPath = await processAudio(videoId, videoUrl)
     
     
             // upload blob to storage
