@@ -5,7 +5,7 @@ import 'dotenv/config'
 class TrackQueue{
     constructor({trackWorker}){
         this.trackWorker = trackWorker
-
+        
 
         // queue db(redis) connection
         this.connection = {
@@ -28,6 +28,7 @@ class TrackQueue{
 
         // worker
         this.worker = null
+        this.jobCount = 0
 
 
         this.init()
@@ -35,7 +36,7 @@ class TrackQueue{
 
 
     // init
-    init(){
+    async init(){
         this.initQueue()
         this.initScheduler()
         this.initWorker()
@@ -51,7 +52,8 @@ class TrackQueue{
     // scheduler
     initScheduler(){
         this.schedulerOption = {
-            every: 1000 * 60 * 60 * 6, // every 6 hours
+            // every: 1000 * 60 * 60 * 1, // every 1 hour
+            every: 1000,
             immediately: true
         }
         this.schedulerJobTemplate = {
@@ -69,10 +71,28 @@ class TrackQueue{
 
     // worker
     initWorker(){
-        this.worker = new Worker(this.queueName, this.processor, {connection: this.connection})
+        this.worker = new Worker(
+            this.queueName, 
+            async job => this.processor(job), 
+            {
+                connection: this.connection, 
+                concurrency: 1 // max parallel work: 1
+            }
+        )
+    }
+    testWork(){
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve()
+            }, 5000)
+        })
     }
     async processor(job){
         console.log('job name: ', job.name)
+
+        await this.testWork()
+
+        console.log(`job done`)
     }
 
 
@@ -80,7 +100,7 @@ class TrackQueue{
     async start(){
         try{
 
-            await this.queue.obliterate()
+            await this.queue.obliterate({force: true})
             await this.queue.upsertJobScheduler(this.schedulerName, this.schedulerOption, this.schedulerJobTemplate)
 
         }catch(err){

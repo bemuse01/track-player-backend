@@ -59,7 +59,7 @@ class Server{
             storage: asClass(Storage, {
                 lifetime: Lifetime.SINGLETON
             }),
-            trackQeueu: asFunction(
+            trackQueue: asFunction(
                 ({trackWorker}) => new TrackQueue({trackWorker}),
                 {
                     lifetime: Lifetime.SINGLETON,
@@ -84,8 +84,10 @@ class Server{
     onReady(err){
         if(err) throw new Error(err.message, err)
         // console.log(JSON.parse(process.env.CONTAINER_NAME))
-        const trackWorker = this.fastify.diContainer.resolve('trackWorker')
-        trackWorker.doWork()
+        // const trackWorker = this.fastify.diContainer.resolve('trackWorker')
+        // trackWorker.doWork()
+        const trackQueue = this.fastify.diContainer.resolve('trackQueue')
+        trackQueue.start()
     }
     
 
