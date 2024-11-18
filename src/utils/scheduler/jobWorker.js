@@ -21,6 +21,7 @@ class JobWorker{
 
     // 
     async doWork(){
+        await this.delete()
         await this.update()
         await this.insert()
     }
@@ -108,13 +109,39 @@ class JobWorker{
     // delete all tracks in db, storage if playlist deleted in youtube
     async delete(){
         console.log('delete start')
-        await Promise.all(this.playlistIds.map(pid => this.deleteWorks(pid)))
+        const currentPlaylistIds = [...this.playlistIds]
+        await Promise.all(currentPlaylistIds.map(pid => this.deleteWorks(pid)))
         console.log('delete done')
     }
-    async deleteWorks(){
+    async deleteWorks(pid){
         try{
 
+            const {youtube, dbWork, storageWork} = this
+
             
+            // 
+            const {error} = await youtube.getDataFromYoutube(pid)
+
+
+            // return if no error
+            if(!error) return
+
+            
+            // 
+            const trackIds = (await getAllTracksByPlaylistId(pid)).map(item => item.track_id)
+
+
+            // delete playlist and tracks if playlist not found or deleted in youtube 
+            // playlist
+            await dbWork.deletePlaylist(pid)
+            // track
+            await dbWork.deleteTracksByPlaylistId(pid)
+            await storageWork.deleteTrackFilesByBatch(trackIds)
+
+
+            // filter playlist ids if delete work done
+            this.playlistIds = this.playlistIds.filter(id => id !== pid)
+            console.log(this.playlistIds)
             
         }catch(err){
 

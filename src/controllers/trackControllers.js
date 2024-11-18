@@ -39,8 +39,10 @@ const insertOrUpdateTracks = async (playlist_id, tracks = []) => {
 
 const deleteTracks = async (trackIds = []) => {
     try{
+
         const query = {track_id: {$in: trackIds}}
         await Track.deleteMany(query)
+
     }catch(err){
 
         console.error(err.message, err)
@@ -48,5 +50,18 @@ const deleteTracks = async (trackIds = []) => {
     }
 }
 
+const deleteTracksByPlaylistId = async (playlistId) => {
+    try{
 
-export {getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks}
+        const qeury = {playlist: playlistId}
+        await Track.deleteMany(qeury)
+
+    }catch(err){
+
+        console.log(err)
+
+    }
+}
+
+
+export {getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId}

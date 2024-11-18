@@ -84,10 +84,10 @@ class Server{
     onReady(err){
         if(err) throw new Error(err.message, err)
         // console.log(JSON.parse(process.env.CONTAINER_NAME))
-        // const trackWorker = this.fastify.diContainer.resolve('jobkWorker')
-        // trackWorker.doWork()
-        const jobQueue = this.fastify.diContainer.resolve('jobQueue')
-        jobQueue.start()
+        const trackWorker = this.fastify.diContainer.resolve('jobWorker')
+        trackWorker.doWork()
+        // const jobQueue = this.fastify.diContainer.resolve('jobQueue')
+        // jobQueue.start()
     }
     
 

@@ -16,10 +16,11 @@ class Youtube{
     async getDataFromYoutube(playlistId){
         try{
             
-            const {playlist_name, playlist_id} = await this.getPlaylistInfo(playlistId)
+            const {playlist_name, playlist_id, error} = await this.getPlaylistInfo(playlistId)
+
+            if(error) return {error}
+
             const items = await this.getPlaylistItems(playlistId)
-    
-            // console.log(title, items)
     
             return {playlistName: playlist_name, playlistId: playlist_id, items}
     
@@ -38,11 +39,15 @@ class Youtube{
                 part: 'snippet',
                 id: playlistId,
             })
+
+            const items = response.data.items
+
+            if(items.length === 0) return {error: 'no playlist'}
     
-            const item = response.data.items[0]
+            const item = items[0]
             const playlist_id = item.id
             const {title} = item.snippet
-    
+
             return {playlist_name: title, playlist_id}
     
         }catch(err){
@@ -75,7 +80,7 @@ class Youtube{
                     const videoId = resourceId.videoId
                     const videoUrl = YOUTUBE_BASE_URL + videoId
     
-                    console.log(videoOwnerChannelTitle, ' -> ', artist)
+                    // console.log(videoOwnerChannelTitle, ' -> ', artist)
     
                     return {title, artist, thumbnailUrl, videoId, videoUrl}
                 })
@@ -96,4 +101,5 @@ class Youtube{
 }
 
 
+// new Youtube().getPlaylistItems('asdasdasdsa')
 export default Youtube
