@@ -1,7 +1,7 @@
 import sharp from 'sharp'
 import axios from 'axios'
-import { IMAGE_SAVE_PATH } from '../config/urls.js'
-import { IMAGE_FORMAT } from '../config/file.js'
+import { IMAGE_SAVE_PATH } from '../../config/urls.js'
+import { IMAGE_FORMAT } from '../../config/file.js'
 import _ from 'lodash'
 import { mkdir } from 'fs/promises'
 

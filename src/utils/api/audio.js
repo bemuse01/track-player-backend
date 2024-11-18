@@ -1,5 +1,5 @@
-import { AUDIO_SAVE_PATH } from '../config/urls.js'
-import { AUDIO_FORMAT } from '../config/file.js'
+import { AUDIO_SAVE_PATH } from '../../config/urls.js'
+import { AUDIO_FORMAT } from '../../config/file.js'
 import { spawn } from 'child_process'
 import { mkdir } from 'fs/promises'
 

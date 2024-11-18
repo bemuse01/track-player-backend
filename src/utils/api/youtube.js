@@ -1,5 +1,5 @@
-import { YOUTUBE_BASE_URL } from '../config/urls.js'
-import { ARTIST_REGEX } from '../config/config.js'
+import { YOUTUBE_BASE_URL } from '../../config/urls.js'
+import { ARTIST_REGEX } from '../../config/config.js'
 import { replaceText } from './helper.js'
 import { google } from 'googleapis'
 import 'dotenv/config'

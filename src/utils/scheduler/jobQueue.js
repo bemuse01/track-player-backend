@@ -3,9 +3,9 @@ import { createClient } from 'redis'
 import 'dotenv/config'
 
 
-class TrackQueue{
-    constructor({trackWorker}){
-        this.trackWorker = trackWorker
+class JobQueue{
+    constructor({jobWorker}){
+        this.jobWorker = jobWorker
         
 
         // queue db(redis) connection
@@ -134,4 +134,4 @@ class TrackQueue{
 }
 
 
-export default TrackQueue
+export default JobQueue
