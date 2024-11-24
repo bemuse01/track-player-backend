@@ -5,6 +5,7 @@ import fastifyFormbody from '@fastify/formbody'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import playlistRoute from '../routes/playlist.js'
+import updateRoute from '../routes/update.js'
 import mongoConnector from '../plugins/mongoConnector.js'
 import redisConnector from '../plugins/redisConnector.js'
 import JobQueue from './scheduler/jobQueue.js'
@@ -48,6 +49,7 @@ class Server{
         this.fastify.register(rootRoute)
         this.fastify.register(playlistRoute)
         this.fastify.register(trackRoute)
+        this.fastify.register(updateRoute)
     }
 
 
