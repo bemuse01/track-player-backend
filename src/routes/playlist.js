@@ -15,13 +15,28 @@ const getShema = {
             properties: {
                 playlists: {type: 'array'}
             }
+        },
+        500: {
+            type: 'string',
+            properties: {
+                error: {type: 'string'}
+            }
         }
     }
 }
 const getHandler = async (request, reply) => {
-    const playlists = await getAllPlaylists()
+    try{
 
-    reply.send({playlists})
+        const playlists = await getAllPlaylists()
+
+        reply.send({playlists})
+
+    }catch(err){
+
+        console.log(err)
+        reply.status(500).send({error: 'internal server error'})
+
+    }
 }
 const get = {
     method: 'GET',

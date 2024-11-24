@@ -21,9 +21,18 @@ class JobWorker{
 
     // 
     async doWork(){
+        const redis = this.fastify.redis
+        const isWorking = await redis.get('isWorking')
+
+        if(isWorking === 'true') return
+
+        await isWorking.set('isWorking', 'true')
+
         await this.delete()
         await this.update()
         await this.insert()
+
+        await isWorking.set('isWorking', 'false')
     }
 
 

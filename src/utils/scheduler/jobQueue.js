@@ -1,10 +1,10 @@
 import { Queue, Worker } from 'bullmq'
-import { createClient } from 'redis'
 import 'dotenv/config'
 
 
 class JobQueue{
-    constructor({jobWorker}){
+    constructor({fastify, jobWorker}){
+        this.fastify = fastify
         this.jobWorker = jobWorker
         
 
@@ -37,25 +37,10 @@ class JobQueue{
 
 
     // init
-    async init(){
-        // await this.initClient()
+    init(){
         this.initQueue()
         this.initScheduler()
         this.initWorker()
-    }
-
-
-    // client
-    async initClient(){
-        const {host, port, password} = this.connection
-
-        this.client = await createClient({
-            socket: {
-                host,
-                port
-            },
-            password
-        }).connect()
     }
 
 
@@ -68,8 +53,8 @@ class JobQueue{
     // scheduler
     initScheduler(){
         this.schedulerOption = {
-            // every: 1000 * 60 * 60 * 1, // every 1 hour
-            every: 1000,
+            every: 1000 * 60 * 60 * 1, // every 1 hour
+            // every: 1000,
             immediately: true
         }
         this.schedulerJobTemplate = {
@@ -96,26 +81,28 @@ class JobQueue{
             }
         )
     }
-    testWork(){
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve()
-            }, 5000)
-        })
+    async initWorkerFlag(){
+        await this.fastify.redis.set('isWorking', 'false')
     }
+    // testWork(){
+    //     return new Promise((resolve, reject) => {
+    //         setTimeout(() => {
+    //             resolve()
+    //         }, 5000)
+    //     })
+    // }
     async processor(job){
         console.log('job name: ', job.name)
-
-        await this.testWork()
-
-        console.log(`job done`)
+       
+        this.jobWorker.doWork()
     }
 
 
     // start
     async start(){
         try{
-
+            
+            await this.initWorkerFlag()
             await this.queue.obliterate({force: true})
             await this.queue.upsertJobScheduler(this.schedulerName, this.schedulerOption, this.schedulerJobTemplate)
 

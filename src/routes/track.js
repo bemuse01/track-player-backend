@@ -47,17 +47,32 @@ const postSchema = {
             properties: {
                 tracks: {type: 'array'}
             }
+        },
+        500: {
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
         }
     }
 }
 const postHandler = async (request, reply) => {
-    const {playlistId} = request.params
+    try{
+        
+        const {playlistId} = request.params
 
-    console.log(playlistId)
+        console.log(playlistId)
 
-    const tracks = await getAllTracksByPlaylistId(playlistId)
+        const tracks = await getAllTracksByPlaylistId(playlistId)
 
-    reply.send({tracks})
+        reply.send({tracks})
+
+    }catch(err){
+
+        console.log(err)
+        reply.status(500).send({error: 'internal server error'})
+
+    }
 }
 const post = {
     method: 'POST',

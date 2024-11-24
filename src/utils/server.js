@@ -5,7 +5,8 @@ import fastifyFormbody from '@fastify/formbody'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import playlistRoute from '../routes/playlist.js'
-import dbConnector from '../plugins/dbConnector.js'
+import mongoConnector from '../plugins/mongoConnector.js'
+import redisConnector from '../plugins/redisConnector.js'
 import JobQueue from './scheduler/jobQueue.js'
 import JobWorker from './scheduler/jobWorker.js'
 import Storage from './api/storage.js'
@@ -38,7 +39,8 @@ class Server{
     // dependencies
     async registerDependencies(){
         this.fastify.register(fastifyFormbody)
-        this.fastify.register(dbConnector)
+        this.fastify.register(mongoConnector)
+        this.fastify.register(redisConnector)
         this.fastify.register(fastifyAwilixPlugin, { disposeOnClose: true, disposeOnResponse: true, strictBooleanEnforced: true })
     }
     // routes
@@ -60,7 +62,7 @@ class Server{
                 lifetime: Lifetime.SINGLETON
             }),
             jobQueue: asFunction(
-                ({jobWorker}) => new JobQueue({jobWorker}),
+                ({fastify, jobWorker}) => new JobQueue({fastify, jobWorker}),
                 {
                     lifetime: Lifetime.SINGLETON,
                     dispose: module => module.dispose()
@@ -84,10 +86,10 @@ class Server{
     onReady(err){
         if(err) throw new Error(err.message, err)
         // console.log(JSON.parse(process.env.CONTAINER_NAME))
-        const trackWorker = this.fastify.diContainer.resolve('jobWorker')
-        trackWorker.doWork()
-        // const jobQueue = this.fastify.diContainer.resolve('jobQueue')
-        // jobQueue.start()
+        // const trackWorker = this.fastify.diContainer.resolve('jobWorker')
+        // trackWorker.doWork()
+        const jobQueue = this.fastify.diContainer.resolve('jobQueue')
+        jobQueue.start()
     }
     
 
