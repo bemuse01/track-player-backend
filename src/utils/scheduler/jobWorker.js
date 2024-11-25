@@ -26,13 +26,13 @@ class JobWorker{
 
         if(isWorking === 'true') return
 
-        await isWorking.set('isWorking', 'true')
+        await redis.set('isWorking', 'true')
 
         await this.delete()
         await this.update()
         await this.insert()
 
-        await isWorking.set('isWorking', 'false')
+        await redis.set('isWorking', 'false')
     }
 
 
