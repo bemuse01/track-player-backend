@@ -39,4 +39,4 @@ RUN npm install
 
 COPY . .
 
-CMD ["node", "src/utils/videoProcessor.js"]
+CMD ["node", "src/app.js"]
