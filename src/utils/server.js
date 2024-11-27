@@ -17,6 +17,7 @@ import 'dotenv/config'
 
 class Server{
     constructor(){
+        this.host = process.env.SERVER_HOST
         this.port = process.env.SERVER_PORT
         this.fastify = Fastify({logger: true})
 
@@ -99,7 +100,7 @@ class Server{
     async start(){
         try{
 
-            await this.fastify.listen({port: this.port})
+            await this.fastify.listen({port: this.port, host: this.host})
 
         }catch(err){
 
