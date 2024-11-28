@@ -8,6 +8,7 @@ import playlistRoute from '../routes/playlist.js'
 import updateRoute from '../routes/update.js'
 import mongoConnector from '../plugins/mongoConnector.js'
 import redisConnector from '../plugins/redisConnector.js'
+import { fastifyCors, corsOption } from '../plugins/cors.js'
 import JobQueue from './scheduler/jobQueue.js'
 import JobWorker from './scheduler/jobWorker.js'
 import Storage from './api/storage.js'
@@ -45,6 +46,7 @@ class Server {
             disposeOnResponse: true,
             strictBooleanEnforced: true,
         })
+        this.fastify.register(fastifyCors, corsOption)
     }
     // routes
     registerRoutes() {
