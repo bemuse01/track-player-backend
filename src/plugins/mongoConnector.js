@@ -3,10 +3,10 @@ import 'dotenv/config'
 import { registerHandler } from '../utils/api/processHandler.js'
 
 const connect = async () => {
-    try{
+    try {
         await mongoose.connect(process.env.MONGODB_URI)
         console.log('succes to connect mongodb')
-    }catch(err){
+    } catch (err) {
         console.log('failed to connect mongodb', err)
     }
 }
@@ -22,6 +22,5 @@ const mongoConnector = async (fastify, options) => {
 
     await connect()
 }
-
 
 export default mongoConnector

@@ -1,75 +1,58 @@
-import { BlobServiceClient } from "@azure/storage-blob"
+import { BlobServiceClient } from '@azure/storage-blob'
 import 'dotenv/config'
 
-
-class Storage{
-    constructor(){
+class Storage {
+    constructor() {
         this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECT_URI)
     }
 
-
     // container
-    async getContainer(containerName){
-        try{
-
-            const {blobServiceClient} = this
+    async getContainer(containerName) {
+        try {
+            const { blobServiceClient } = this
 
             const containerClient = blobServiceClient.getContainerClient(containerName)
-            await containerClient.createIfNotExists({access: 'blob'})
-    
+            await containerClient.createIfNotExists({ access: 'blob' })
+
             // if(!succeeded) throw new Error('container already exists')
 
             return containerClient
-    
-        }catch(err){
-    
+        } catch (err) {
             console.log(err)
-    
         }
     }
-    
 
     // upload
-    async uploadBlob({containerName, blobName, localPath}){
-        try{
-
+    async uploadBlob({ containerName, blobName, localPath }) {
+        try {
             const containerClient = await this.getContainer(containerName)
             const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
-    
+
             await blockBlobClient.uploadFile(localPath)
-    
+
             return blockBlobClient.url
-    
-        }catch(err){
-    
+        } catch (err) {
             console.log(err)
-    
         }
     }
 
-
     // delete
-    async deleteBlob({containerName, blobName}){
-        try{
-
-            const {blobServiceClient} = this
+    async deleteBlob({ containerName, blobName }) {
+        try {
+            const { blobServiceClient } = this
 
             const containerClient = blobServiceClient.getContainerClient(containerName)
             const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
 
             const option = {
-                deleteSnapshots: 'include'
+                deleteSnapshots: 'include',
             }
 
             await blockBlobClient.deleteIfExists(option)
-
-        }catch(err){
-
+        } catch (err) {
             console.log(err)
-
         }
     }
 }
-
 
 export default Storage

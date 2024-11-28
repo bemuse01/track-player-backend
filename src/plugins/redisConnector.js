@@ -3,7 +3,6 @@ import { createClient } from 'redis'
 import { registerHandler } from '../utils/api/processHandler.js'
 import 'dotenv/config'
 
-
 const host = process.env.REDIS_HOST
 const port = process.env.REDIS_PORT
 const password = process.env.REDIS_PASSWORD
@@ -11,16 +10,16 @@ const password = process.env.REDIS_PASSWORD
 const client = createClient({
     socket: {
         host,
-        port
+        port,
     },
-    password
+    password,
 })
 
 const connect = async () => {
-    try{
+    try {
         await client.connect()
         console.log('succes to connect redis')
-    }catch(err){
+    } catch (err) {
         console.log('failed to connect redis', err)
     }
 }
@@ -38,6 +37,5 @@ const redisConnector = fp(async (fastify, option) => {
 
     fastify.decorate('redis', client)
 })
-
 
 export default redisConnector

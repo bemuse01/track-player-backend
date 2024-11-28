@@ -1,12 +1,10 @@
 import { Queue, Worker } from 'bullmq'
 import 'dotenv/config'
 
-
-class JobQueue{
-    constructor({fastify, jobWorker}){
+class JobQueue {
+    constructor({ fastify, jobWorker }) {
         this.fastify = fastify
         this.jobWorker = jobWorker
-        
 
         // queue db(redis) connection
         this.connection = {
@@ -15,47 +13,40 @@ class JobQueue{
             password: process.env.REDIS_PASSWORD,
         }
 
-
         // queue
         this.queueName = 'track-queue'
         this.queue = null
-
 
         // scheduler
         this.schedulerName = 'track-scheduler'
         this.schedulerOption = null
         this.schedulerJobTemplate = null
 
-
         // worker
         this.worker = null
         this.jobCount = 0
 
-
         this.init()
     }
 
-
     // init
-    init(){
+    init() {
         this.initQueue()
         this.initScheduler()
         this.initWorker()
     }
 
-
     // queue
-    initQueue(){
-        this.queue = new Queue(this.queueName, {connection: this.connection})
+    initQueue() {
+        this.queue = new Queue(this.queueName, { connection: this.connection })
     }
 
-
     // scheduler
-    initScheduler(){
+    initScheduler() {
         this.schedulerOption = {
             every: 1000 * 60 * 60 * 1, // every 1 hour
             // every: 1000,
-            immediately: true
+            immediately: true,
         }
         this.schedulerJobTemplate = {
             name: 'track-job',
@@ -63,25 +54,20 @@ class JobQueue{
                 // msg: 'hello'
             },
             opts: {
-                removeOnComplete: true, 
-                removeOnFail: true 
-            }
+                removeOnComplete: true,
+                removeOnFail: true,
+            },
         }
     }
 
-
     // worker
-    initWorker(){
-        this.worker = new Worker(
-            this.queueName, 
-            async job => this.processor(job), 
-            {
-                connection: this.connection, 
-                concurrency: 1 // max parallel work: 1
-            }
-        )
+    initWorker() {
+        this.worker = new Worker(this.queueName, async (job) => this.processor(job), {
+            connection: this.connection,
+            concurrency: 1, // max parallel work: 1
+        })
     }
-    async initWorkerFlag(){
+    async initWorkerFlag() {
         await this.fastify.redis.set('isWorking', 'false')
     }
     // testWork(){
@@ -91,34 +77,25 @@ class JobQueue{
     //         }, 5000)
     //     })
     // }
-    async processor(job){
+    async processor(job) {
         console.log('job name: ', job.name)
-       
+
         this.jobWorker.doWork()
     }
 
-
     // start
-    async start(){
-        try{
-            
+    async start() {
+        try {
             await this.initWorkerFlag()
-            await this.queue.obliterate({force: true})
+            await this.queue.obliterate({ force: true })
             await this.queue.upsertJobScheduler(this.schedulerName, this.schedulerOption, this.schedulerJobTemplate)
-
-        }catch(err){
-
+        } catch (err) {
             console.log(err)
-
         }
     }
 
-
-    // 
-    dispose(){
-
-    }
+    //
+    dispose() {}
 }
-
 
 export default JobQueue
