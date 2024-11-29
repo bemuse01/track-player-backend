@@ -1,4 +1,4 @@
-const AUDIO_FORMAT = 'mp3'
+const AUDIO_FORMAT = 'webm'
 const IMAGE_FORMAT = 'jpg'
 const IMAGE_FLAG = 'image'
 const AUDIO_FLAG = 'audio'

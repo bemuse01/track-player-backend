@@ -39,18 +39,29 @@ class StorageWork {
         // create and save image, audio file on local
         const { main_color, savePath: localImagePath } = await processImage(videoId, thumbnailUrl)
         const localAudioPath = await processAudio(videoId, videoUrl)
+        console.log(videoId, videoUrl, localAudioPath)
+
+        if (!localImagePath) {
+            throw new Error(`no local image error`)
+        }
+
+        if (!localAudioPath) {
+            throw new Error(`no local audio error`)
+        }
 
         // upload blob to storage
         const blobs = [
             {
                 localPath: localImagePath,
                 containerName: process.env.THUMBNAIL_CONTAINER_NAME,
-                blobName: localImagePath.split('/').pop(),
+                // blobName: localImagePath.split('/').pop(),
+                blobName: videoId + '.' + IMAGE_FORMAT,
             },
             {
                 localPath: localAudioPath,
                 containerName: process.env.AUDIO_CONTAINER_NAME,
-                blobName: localAudioPath.split('/').pop(),
+                // blobName: localAudioPath.split('/').pop(),
+                blobName: videoId + '.' + AUDIO_FORMAT,
             },
         ]
         const [thumbnail_url, audio_url] = await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))

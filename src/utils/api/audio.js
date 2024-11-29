@@ -7,9 +7,9 @@ const download = (cmd, args) => {
     return new Promise((resolve, reject) => {
         const process = spawn(cmd, args)
 
-        process.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`)
-        })
+        // process.stdout.on('data', (data) => {
+        //     console.log(`stdout: ${data}`)
+        // })
 
         process.stderr.on('data', (data) => {
             console.error(`stderr: ${data}`)
@@ -37,7 +37,8 @@ const processAudio = async (id, url) => {
         const savePath = `${AUDIO_SAVE_PATH}${id}.${AUDIO_FORMAT}`
 
         const cmd = 'yt-dlp'
-        const args = ['--extract-audio', '--audio-format', AUDIO_FORMAT, '-o', savePath, url]
+        // const args = ['--extract-audio', '--audio-format', AUDIO_FORMAT, '-o', savePath, url]
+        const args = ['-f', 'bestaudio[ext=webm]', '-o', savePath, url]
 
         await download(cmd, args)
 
