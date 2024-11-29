@@ -60,6 +60,7 @@ const processImage = async (id, url) => {
         const hex = toHex(r, g, b)
 
         // save
+        // TODO makde directory named playlist id like this assets/images/:playlistid/
         await mkdir(IMAGE_SAVE_PATH, { recursive: true })
 
         const savePath = IMAGE_SAVE_PATH + id + '.' + IMAGE_FORMAT

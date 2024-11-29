@@ -32,6 +32,8 @@ const download = (cmd, args) => {
 
 const processAudio = async (id, url) => {
     try {
+        // TODO makde directory named playlist id like this assets/audio/:playlistid/
+
         await mkdir(AUDIO_SAVE_PATH, { recursive: true })
 
         const savePath = `${AUDIO_SAVE_PATH}${id}.${AUDIO_FORMAT}`
