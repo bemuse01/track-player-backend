@@ -1,34 +1,16 @@
+import { findPlaylist } from '../controllers/playlistController.js'
 import { getAllTracksByPlaylistId } from '../controllers/trackControllers.js'
-
-// get
-const getShema = {
-    querystring: {
-        type: 'object',
-        properties: {
-            // playlistId: {type: 'string'},
-        },
-    },
-    response: {
-        200: {
-            type: 'object',
-            properties: {
-                test: { type: 'string' },
-            },
-        },
-    },
-}
-const getHandler = async (request, reply) => {
-    // const {artist, title} = request.query
-    reply.send({ test: 'get' })
-}
-const get = {
-    method: 'GET',
-    url: '/track',
-    schema: getShema,
-    handler: getHandler,
-}
+import ResponseHelper from '../utils/api/responseHelper.js'
 
 // post
+const responseSchema = {
+    type: 'object',
+    properties: {
+        error: { type: 'string', nullable: true },
+        data: { type: 'array', nullable: true },
+        message: { type: 'string', nullable: true },
+    },
+}
 const postSchema = {
     body: {
         type: 'object',
@@ -38,32 +20,34 @@ const postSchema = {
         },
     },
     response: {
-        200: {
-            type: 'object',
-            properties: {
-                tracks: { type: 'array' },
-            },
-        },
-        500: {
-            type: 'object',
-            properties: {
-                error: { type: 'string' },
-            },
-        },
+        200: responseSchema,
+        404: responseSchema,
+        500: responseSchema,
     },
 }
 const postHandler = async (request, reply) => {
     try {
         const { playlistId } = request.params
-
         console.log(playlistId)
 
-        const tracks = await getAllTracksByPlaylistId(playlistId)
+        const playlist = await findPlaylist(playlistId)
 
-        reply.send({ tracks })
+        if (!playlist) {
+            const { code, response } = ResponseHelper.NOT_FOUND('Invalid Playlist Id.')
+
+            reply.status(code).send(response)
+        } else {
+            const tracks = await getAllTracksByPlaylistId(playlistId)
+
+            const { code, response } = ResponseHelper.OK(tracks)
+
+            reply.status(code).send(response)
+        }
     } catch (err) {
         console.log(err)
-        reply.status(500).send({ error: 'internal server error' })
+
+        const { code, response } = ResponseHelper.INTERNAL_SERVER_ERROR(err)
+        reply.status(code).send(response)
     }
 }
 const post = {
@@ -74,8 +58,6 @@ const post = {
 }
 
 const track = async (fastify, options) => {
-    fastify.route(get)
-
     fastify.route(post)
 }
 

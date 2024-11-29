@@ -10,6 +10,12 @@ export default [
   pluginJs.configs.recommended,
   {
     rules: {
+      'prettier/prettier': [
+        'error',
+        {
+            endOfLine: 'auto',
+        },
+      ],
       "no-unused-vars": "warn",
       "no-undef": "warn"
     },

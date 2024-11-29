@@ -2,7 +2,7 @@ import Fastify from 'fastify'
 import { fastifyAwilixPlugin, diContainer } from '@fastify/awilix'
 import { asClass, asFunction, asValue, Lifetime } from 'awilix'
 import fastifyFormbody from '@fastify/formbody'
-import rootRoute from '../routes/root.js'
+// import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import playlistRoute from '../routes/playlist.js'
 import updateRoute from '../routes/update.js'
@@ -50,7 +50,7 @@ class Server {
     }
     // routes
     registerRoutes() {
-        this.fastify.register(rootRoute)
+        // this.fastify.register(rootRoute)
         this.fastify.register(playlistRoute)
         this.fastify.register(trackRoute)
         this.fastify.register(updateRoute)

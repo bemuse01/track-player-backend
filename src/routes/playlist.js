@@ -1,6 +1,15 @@
 import { getAllPlaylists } from '../controllers/playlistController.js'
+import ResponseHelper from '../utils/api/responseHelper.js'
 
 // get
+const responseSchema = {
+    type: 'object',
+    properties: {
+        error: { type: 'string', nullable: true },
+        data: { type: 'array', nullable: true },
+        message: { type: 'string', nullable: true },
+    },
+}
 const getShema = {
     querystring: {
         type: 'object',
@@ -9,28 +18,23 @@ const getShema = {
         },
     },
     response: {
-        200: {
-            type: 'object',
-            properties: {
-                playlists: { type: 'array' },
-            },
-        },
-        500: {
-            type: 'string',
-            properties: {
-                error: { type: 'string' },
-            },
-        },
+        200: responseSchema,
+        500: responseSchema,
     },
 }
 const getHandler = async (request, reply) => {
     try {
         const playlists = await getAllPlaylists()
 
-        reply.send({ playlists })
+        const { code, response } = ResponseHelper.OK(playlists)
+
+        reply.status(code).send(response)
     } catch (err) {
         console.log(err)
-        reply.status(500).send({ error: 'internal server error' })
+
+        const { code, response } = ResponseHelper.INTERNAL_SERVER_ERROR(err)
+
+        reply.status(code).send(response)
     }
 }
 const get = {

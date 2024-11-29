@@ -31,4 +31,16 @@ const deletePlaylist = async (playlistId) => {
     }
 }
 
-export { insertOrUpdatePlaylist, getAllPlaylists, deletePlaylist }
+const findPlaylist = async (playlistId) => {
+    try {
+        const query = { _id: playlistId }
+
+        const playlist = await Playlist.findOne(query)
+
+        return playlist
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export { insertOrUpdatePlaylist, getAllPlaylists, deletePlaylist, findPlaylist }
