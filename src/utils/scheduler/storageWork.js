@@ -3,11 +3,15 @@ import { processImage } from '../api/image.js'
 import { processAudio } from '../api/audio.js'
 import { deleteLocalFile } from '../api/local.js'
 import { AUDIO_FORMAT, IMAGE_FORMAT } from '../../config/file.js'
+import pLimit from 'p-limit'
+
+// TODO batch will be replace with p-limit
 
 class StorageWork {
     constructor(storage) {
         this.storage = storage
         this.batchSize = PROMISE_BATCH_SIZE
+        this.limit = pLimit(PROMISE_BATCH_SIZE)
     }
 
     // track
