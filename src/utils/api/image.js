@@ -1,9 +1,9 @@
+import { mkdir } from 'fs/promises'
 import sharp from 'sharp'
 import axios from 'axios'
+import _ from 'lodash'
 import { IMAGE_SAVE_PATH } from '../../config/urls.js'
 import { IMAGE_FORMAT } from '../../config/file.js'
-import _ from 'lodash'
-import { mkdir } from 'fs/promises'
 
 const toHex = (r, g, b) => {
     return [r, g, b]
@@ -32,7 +32,7 @@ const toStringArray = (pixels, width, height, channels) => {
     return temp
 }
 
-const processImage = async (id, url) => {
+const processImage = async ({ videoId, url, playlistId }) => {
     try {
         const response = await axios({ url, responseType: 'arraybuffer' })
         const input = response.data
@@ -60,10 +60,10 @@ const processImage = async (id, url) => {
         const hex = toHex(r, g, b)
 
         // save
-        // TODO makde directory named playlist id like this assets/images/:playlistid/
-        await mkdir(IMAGE_SAVE_PATH, { recursive: true })
+        const playlistPath = IMAGE_SAVE_PATH + playlistId + '/'
+        await mkdir(playlistPath, { recursive: true })
 
-        const savePath = IMAGE_SAVE_PATH + id + '.' + IMAGE_FORMAT
+        const savePath = playlistPath + videoId + '.' + IMAGE_FORMAT
         await croppedImage.toFile(savePath)
 
         return { main_color: hex, savePath }

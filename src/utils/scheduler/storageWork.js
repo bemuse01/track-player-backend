@@ -1,11 +1,9 @@
 import { PROMISE_BATCH_SIZE } from '../../config/config.js'
 import { processImage } from '../api/image.js'
 import { processAudio } from '../api/audio.js'
-import { deleteLocalFile } from '../api/local.js'
+import { deleteFile } from '../api/local.js'
 import { AUDIO_FORMAT, IMAGE_FORMAT } from '../../config/file.js'
 import pLimit from 'p-limit'
-
-// TODO batch will be replace with p-limit
 
 class StorageWork {
     constructor(storage) {
@@ -19,39 +17,22 @@ class StorageWork {
     // upload
     async uploadTrackFilesByBatch(playlistId, items) {
         // process promises by batch
-        const { batchSize } = this
-        const promises = []
+        const { limit } = this
 
-        for (let i = 0; i < items.length; i += batchSize) {
-            const startIdx = i
-            const endIdx = i + batchSize
-            const batch = items.slice(startIdx, endIdx).map((item) => this.uploadTrackFiles(item))
-            promises.push(await Promise.all(batch))
+        const limits = items.map((item) => limit(() => this.uploadTrackFiles(item, playlistId)))
 
-            console.log('batch length: ', promises.length)
-        }
-
-        // wait all batch
-        const tracks = (await Promise.all(promises)).flat().map((item) => ({ ...item, playlist: playlistId }))
+        const tracks = await Promise.all(limits)
 
         return tracks
     }
-    async uploadTrackFiles(item) {
+    async uploadTrackFiles(item, playlistId) {
         const { storage } = this
         const { videoId, thumbnailUrl, videoUrl, artist, title } = item
 
         // create and save image, audio file on local
-        const { main_color, savePath: localImagePath } = await processImage(videoId, thumbnailUrl)
-        const localAudioPath = await processAudio(videoId, videoUrl)
-        console.log(videoId, videoUrl, localAudioPath)
-
-        if (!localImagePath) {
-            throw new Error(`no local image error`)
-        }
-
-        if (!localAudioPath) {
-            throw new Error(`no local audio error`)
-        }
+        const { main_color, savePath: localImagePath } = await processImage({ videoId, url: thumbnailUrl, playlistId })
+        const localAudioPath = await processAudio({ videoId, url: videoUrl, playlistId })
+        console.log(videoId, localAudioPath)
 
         // upload blob to storage
         const blobs = [
@@ -71,7 +52,7 @@ class StorageWork {
         const [thumbnail_url, audio_url] = await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))
 
         // delete local file
-        await deleteLocalFile([localImagePath, localAudioPath])
+        await Promise.all(blobs.map(({ localPath }) => deleteFile(localPath)))
 
         return {
             track_id: videoId,
@@ -86,19 +67,12 @@ class StorageWork {
     // delete
     async deleteTrackFilesByBatch(trackIds) {
         // process promises by batch
-        const { batchSize } = this
-        const promises = []
+        const { limit } = this
 
-        for (let i = 0; i < trackIds.length; i += batchSize) {
-            const startIdx = i
-            const endIdx = i + batchSize
-            const batch = trackIds.slice(startIdx, endIdx).map((trackId) => this.deleteTrackFiles(trackId))
-
-            promises.push(await Promise.all(batch))
-        }
+        const limits = trackIds.map((trackId) => limit(() => this.deleteTrackFiles(trackId)))
 
         // wait all batch
-        await Promise.all(promises)
+        await Promise.all(limits)
     }
     async deleteTrackFiles(trackId) {
         const { storage } = this

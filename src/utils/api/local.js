@@ -1,4 +1,4 @@
-import { unlink, access, constants } from 'fs/promises'
+import { unlink, access, constants, rm } from 'fs/promises'
 
 const deleteFile = async (path) => {
     try {
@@ -9,12 +9,12 @@ const deleteFile = async (path) => {
     }
 }
 
-const deleteLocalFile = async (paths) => {
+const deleteDir = async (path) => {
     try {
-        await Promise.all(paths.map((path) => deleteFile(path)))
+        await rm(path, { recursive: true, force: true })
     } catch (err) {
         console.log(err)
     }
 }
 
-export { deleteLocalFile }
+export { deleteFile, deleteDir }

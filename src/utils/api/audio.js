@@ -30,13 +30,12 @@ const download = (cmd, args) => {
     })
 }
 
-const processAudio = async (id, url) => {
+const processAudio = async ({ videoId, url, playlistId }) => {
     try {
-        // TODO makde directory named playlist id like this assets/audio/:playlistid/
+        const playlistPath = AUDIO_SAVE_PATH + playlistId + '/'
+        await mkdir(playlistPath, { recursive: true })
 
-        await mkdir(AUDIO_SAVE_PATH, { recursive: true })
-
-        const savePath = `${AUDIO_SAVE_PATH}${id}.${AUDIO_FORMAT}`
+        const savePath = `${playlistPath}${videoId}.${AUDIO_FORMAT}`
 
         const cmd = 'yt-dlp'
         // const args = ['--extract-audio', '--audio-format', AUDIO_FORMAT, '-o', savePath, url]

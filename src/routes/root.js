@@ -16,10 +16,10 @@ const rootShema = {
 }
 
 const rootHandler = async (request, reply) => {
-    const { name } = request.query
-    const msg = 'world, ' + name
+    // const { name } = request.query
+    // const msg = 'world, ' + name
 
-    return { hello: msg }
+    return { hello: 'world' }
 }
 const root = async (fastify, options) => {
     fastify.route({

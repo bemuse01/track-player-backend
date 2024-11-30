@@ -3,6 +3,7 @@ import { PLAYLIST_IDS } from '../../config/urls.js'
 import { getAllTracksByPlaylistId } from '../../controllers/trackControllers.js'
 import DbWork from './dbWork.js'
 import StorageWork from './storageWork.js'
+import LocalWork from './localWork.js'
 
 class JobWorker {
     constructor({ fastify, storage, youtube }) {
@@ -14,6 +15,7 @@ class JobWorker {
 
         this.dbWork = new DbWork()
         this.storageWork = new StorageWork(storage)
+        this.localWork = new LocalWork()
     }
 
     //
@@ -28,6 +30,7 @@ class JobWorker {
         await this.delete()
         await this.update()
         await this.insert()
+        await this.end()
 
         await redis.set('isWorking', 'false')
     }
@@ -127,6 +130,19 @@ class JobWorker {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    // when all works end
+    async end() {
+        console.log('end start')
+        await Promise.all(this.playlistIds.map((pid) => this.endWorks(pid)))
+        console.log('end done')
+    }
+    async endWorks() {
+        const { localWork } = this
+
+        // delete playlist dirs by deleting audio, images dir
+        await localWork.deleteAssets()
     }
 
     dispose() {}
