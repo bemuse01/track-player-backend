@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { insertOrUpdatePlaylist, getAllPlaylists, deletePlaylist, findPlaylist } from './quaries.js'
 
 const playlistSchema = new mongoose.Schema({
     _id: { type: String, required: true, trim: true },
@@ -12,4 +13,4 @@ playlistSchema.set('timestamps', {
 
 const Playlist = new mongoose.model('Playlist', playlistSchema)
 
-export default Playlist
+export { Playlist, insertOrUpdatePlaylist, getAllPlaylists, deletePlaylist, findPlaylist }

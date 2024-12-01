@@ -1,5 +1,6 @@
 import { getAllPlaylists } from '../controllers/playlistController.js'
 import ResponseHelper from '../utils/api/responseHelper.js'
+import { readFile } from 'fs/promises'
 
 // get
 const responseSchema = {
@@ -25,24 +26,27 @@ const getShema = {
 }
 const getHandler = (fastify) => async (request, reply) => {
     try {
-        const redis = fastify.redis
-        const isWorking = await redis.get('isWorking')
+        await readFile('./ds/dsdsads')
+        // reply.status(code).send(response)
+        // throw new Error('TEST ERROR')
+        // const redis = fastify.redis
+        // const isWorking = await redis.get('isWorking')
 
-        if (isWorking === 'true') {
-            const { code, response } = ResponseHelper.NO_CONTENT('Update in progress.')
+        // if (isWorking === 'true') {
+        //     const { code, response } = ResponseHelper.NO_CONTENT('Update in progress.')
 
-            reply.status(code).send(response)
-        } else {
-            const trackWorker = request.diScope.resolve('jobWorker')
-            await trackWorker.doWork()
+        //     reply.status(code).send(response)
+        // } else {
+        //     const trackWorker = request.diScope.resolve('jobWorker')
+        //     await trackWorker.doWork()
 
-            const playlists = await getAllPlaylists()
-            const { code, response } = ResponseHelper.OK(playlists, 'Update complete.')
+        //     const playlists = await getAllPlaylists()
+        //     const { code, response } = ResponseHelper.OK(playlists, 'Update complete.')
 
-            reply.status(code).send(response)
-        }
+        //     reply.status(code).send(response)
+        // }
     } catch (err) {
-        console.log(err)
+        console.log(err.message)
 
         const { code, response } = ResponseHelper.INTERNAL_SERVER_ERROR(err)
 

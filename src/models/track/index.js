@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId } from './quaries.js'
 
 const trackSchema = new mongoose.Schema({
     track_id: { type: String, required: true, trim: true },
@@ -16,4 +17,4 @@ trackSchema.set('timestamps', {
 
 const Track = new mongoose.model('Track', trackSchema)
 
-export default Track
+export { Track, getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId }

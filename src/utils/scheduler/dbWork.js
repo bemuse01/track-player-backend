@@ -1,5 +1,5 @@
-import { insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId } from '../../controllers/trackControllers.js'
-import { insertOrUpdatePlaylist, deletePlaylist } from '../../controllers/playlistController.js'
+import { insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId } from '../../models/track'
+import { insertOrUpdatePlaylist, deletePlaylist } from '../../models/playlist'
 
 class DbWork {
     // track

@@ -1,58 +1,64 @@
-import { BlobServiceClient } from '@azure/storage-blob'
-import 'dotenv/config'
+import { BlobServiceClient } from '@azure/storage-blob';
+import 'dotenv/config';
 
 class Storage {
-    constructor() {
-        this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECT_URI)
-    }
+	constructor() {
+		this.blobServiceClient = BlobServiceClient.fromConnectionString(
+			process.env.AZURE_STORAGE_CONNECT_URI,
+		);
+	}
 
-    // container
-    async getContainer(containerName) {
-        try {
-            const { blobServiceClient } = this
+	// container
+	async getContainer(containerName) {
+		try {
+			const { blobServiceClient } = this;
 
-            const containerClient = blobServiceClient.getContainerClient(containerName)
-            await containerClient.createIfNotExists({ access: 'blob' })
+			const containerClient =
+				blobServiceClient.getContainerClient(containerName);
+			await containerClient.createIfNotExists({ access: 'blob' });
 
-            // if(!succeeded) throw new Error('container already exists')
+			// if(!succeeded) throw new Error('container already exists')
 
-            return containerClient
-        } catch (err) {
-            console.log(err)
-        }
-    }
+			return containerClient;
+		} catch (err) {
+			console.log(err);
+		}
+	}
 
-    // upload
-    async uploadBlob({ containerName, blobName, localPath }) {
-        try {
-            const containerClient = await this.getContainer(containerName)
-            const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
+	// upload
+	async uploadBlob({ containerName, blobName, localPath }) {
+		try {
+			const containerClient = await this.getContainer(containerName);
+			const blockBlobClient =
+				await containerClient.getBlockBlobClient(blobName);
 
-            await blockBlobClient.uploadFile(localPath)
+			await blockBlobClient.uploadFile(localPath);
 
-            return blockBlobClient.url
-        } catch (err) {
-            console.log(err)
-        }
-    }
+			return blockBlobClient.url;
+		} catch (err) {
+			console.log(err);
+		}
+	}
 
-    // delete
-    async deleteBlob({ containerName, blobName }) {
-        try {
-            const { blobServiceClient } = this
+	// delete
+	async deleteBlob({ containerName, blobName }) {
+		try {
+			const { blobServiceClient } = this;
 
-            const containerClient = blobServiceClient.getContainerClient(containerName)
-            const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
+			const containerClient =
+				blobServiceClient.getContainerClient(containerName);
+			const blockBlobClient =
+				await containerClient.getBlockBlobClient(blobName);
 
-            const option = {
-                deleteSnapshots: 'include',
-            }
+			const option = {
+				deleteSnapshots: 'include',
+			};
 
-            await blockBlobClient.deleteIfExists(option)
-        } catch (err) {
-            console.log(err)
-        }
-    }
+			await blockBlobClient.deleteIfExists(option);
+		} catch (err) {
+			console.log(err);
+		}
+	}
 }
 
-export default Storage
+export default Storage;

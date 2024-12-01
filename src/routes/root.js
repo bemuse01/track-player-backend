@@ -1,33 +1,7 @@
-const rootShema = {
-    querystring: {
-        type: 'object',
-        properties: {
-            name: { type: 'string', default: 'name' },
-        },
-    },
-    response: {
-        200: {
-            type: 'object',
-            properties: {
-                hello: { type: 'string' },
-            },
-        },
-    },
-}
+import { getRoot } from '../controllers/root'
 
-const rootHandler = async (request, reply) => {
-    // const { name } = request.query
-    // const msg = 'world, ' + name
-
-    return { hello: 'world' }
-}
 const root = async (fastify, options) => {
-    fastify.route({
-        method: 'GET',
-        url: '/',
-        schema: rootShema,
-        handler: rootHandler,
-    })
+    fastify.route(getRoot)
 }
 
 export default root

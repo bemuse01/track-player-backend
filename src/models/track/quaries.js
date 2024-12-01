@@ -1,4 +1,4 @@
-import Track from '../models/track.js'
+import Track from '../models/track/index.js'
 
 const getAllTracksByPlaylistId = async (playlistId) => {
     try {
