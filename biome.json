@@ -6,12 +6,13 @@
 		"useIgnoreFile": false
 	},
 	"files": {
-		"ignoreUnknown": false,
+		"ignoreUnknown": true,
 		"ignore": []
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"lineWidth": 120
 	},
 	"organizeImports": {
 		"enabled": true
@@ -19,12 +20,22 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"correctness": {
+				"noUnusedVariables": "warn",
+				"noUndeclaredVariables": "warn"
+			},
+			"style": {
+				"useTemplate": "off"
+			}
 		}
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "single"
+			"quoteStyle": "single",
+			"semicolons": "asNeeded",
+			"trailingCommas": "es5",
+			"arrowParentheses": "always",
+			"bracketSpacing": true
 		}
 	}
 }

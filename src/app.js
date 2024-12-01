@@ -1,4 +1,4 @@
-import Server from './utils/server.js';
+import Server from './utils/server.js'
 
-const server = new Server();
-server.start();
+const server = new Server()
+server.start()

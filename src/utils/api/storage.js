@@ -1,64 +1,58 @@
-import { BlobServiceClient } from '@azure/storage-blob';
-import 'dotenv/config';
+import { BlobServiceClient } from '@azure/storage-blob'
+import 'dotenv/config'
 
 class Storage {
 	constructor() {
-		this.blobServiceClient = BlobServiceClient.fromConnectionString(
-			process.env.AZURE_STORAGE_CONNECT_URI,
-		);
+		this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECT_URI)
 	}
 
 	// container
 	async getContainer(containerName) {
 		try {
-			const { blobServiceClient } = this;
+			const { blobServiceClient } = this
 
-			const containerClient =
-				blobServiceClient.getContainerClient(containerName);
-			await containerClient.createIfNotExists({ access: 'blob' });
+			const containerClient = blobServiceClient.getContainerClient(containerName)
+			await containerClient.createIfNotExists({ access: 'blob' })
 
 			// if(!succeeded) throw new Error('container already exists')
 
-			return containerClient;
+			return containerClient
 		} catch (err) {
-			console.log(err);
+			console.log(err)
 		}
 	}
 
 	// upload
 	async uploadBlob({ containerName, blobName, localPath }) {
 		try {
-			const containerClient = await this.getContainer(containerName);
-			const blockBlobClient =
-				await containerClient.getBlockBlobClient(blobName);
+			const containerClient = await this.getContainer(containerName)
+			const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
 
-			await blockBlobClient.uploadFile(localPath);
+			await blockBlobClient.uploadFile(localPath)
 
-			return blockBlobClient.url;
+			return blockBlobClient.url
 		} catch (err) {
-			console.log(err);
+			console.log(err)
 		}
 	}
 
 	// delete
 	async deleteBlob({ containerName, blobName }) {
 		try {
-			const { blobServiceClient } = this;
+			const { blobServiceClient } = this
 
-			const containerClient =
-				blobServiceClient.getContainerClient(containerName);
-			const blockBlobClient =
-				await containerClient.getBlockBlobClient(blobName);
+			const containerClient = blobServiceClient.getContainerClient(containerName)
+			const blockBlobClient = await containerClient.getBlockBlobClient(blobName)
 
 			const option = {
 				deleteSnapshots: 'include',
-			};
+			}
 
-			await blockBlobClient.deleteIfExists(option);
+			await blockBlobClient.deleteIfExists(option)
 		} catch (err) {
-			console.log(err);
+			console.log(err)
 		}
 	}
 }
 
-export default Storage;
+export default Storage
