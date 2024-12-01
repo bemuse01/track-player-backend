@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { PLAYLIST_IDS } from '../../config/urls.js'
-import { getAllTracksByPlaylistId } from '../../controllers/trackControllers.js'
 import DbWork from './dbWork.js'
 import LocalWork from './localWork.js'
 import StorageWork from './storageWork.js'
@@ -50,7 +49,7 @@ class JobWorker {
 
 			// filter tracks already in db
 			const tracksInYT = items
-			const tracksInDB = await getAllTracksByPlaylistId(playlistId)
+			const tracksInDB = await dbWork.getTracksByPlaylistId(pid)
 			const tracksToInsert = _.differenceWith(tracksInYT, tracksInDB, (x, y) => x.videoId === y.track_id)
 
 			// stop to insert if no change anything
@@ -83,7 +82,7 @@ class JobWorker {
 			// filter tracks not in youtube playlist
 			const { playlistId, playlistName, items } = await youtube.getDataFromYoutube(pid)
 			const trackIdsInYT = items.map((item) => item.videoId)
-			const trackIdsInDB = (await getAllTracksByPlaylistId(pid)).map((item) => item.track_id)
+			const trackIdsInDB = await dbWork.getTrackIdsByPlaylistId(pid)
 			const trackIdsToDelete = _.difference(trackIdsInDB, trackIdsInYT)
 
 			// update playlist track order and delete tracks from db and storage
@@ -115,7 +114,7 @@ class JobWorker {
 			if (!error) return
 
 			//
-			const trackIds = (await getAllTracksByPlaylistId(pid)).map((item) => item.track_id)
+			const trackIds = await dbWork.getTrackIdsByPlaylistId(pid)
 
 			// delete playlist and tracks if playlist not found or deleted in youtube
 			// playlist

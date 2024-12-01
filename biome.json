@@ -1,9 +1,9 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
 	"vcs": {
-		"enabled": false,
+		"enabled": true,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": true,
@@ -36,6 +36,14 @@
 			"trailingCommas": "es5",
 			"arrowParentheses": "always",
 			"bracketSpacing": true
+		}
+	},
+	"json": {
+		"linter": {
+			"enabled": false
+		},
+		"formatter": {
+			"enabled": false
 		}
 	}
 }

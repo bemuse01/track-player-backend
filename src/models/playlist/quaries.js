@@ -1,4 +1,4 @@
-import Playlist from '../models/playlist/index.js'
+import { Playlist } from './index.js'
 
 const getAllPlaylists = async () => {
 	try {

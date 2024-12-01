@@ -1,8 +1,8 @@
-import { findPlaylist } from '../../models/playlist'
-import { getAllTracksByPlaylistId } from '../../models/track'
-import ResponseHelper from '../../utils/api/responseHelper'
+import { findPlaylist } from '../../models/playlist/index.js'
+import { getAllTracksByPlaylistId } from '../../models/track/index.js'
+import ResponseHelper from '../../utils/api/responseHelper.js'
 
-const method = 'GET'
+const method = 'POST'
 const url = '/track/:playlistId'
 const responseSchema = {
 	type: 'object',
@@ -49,9 +49,9 @@ const handler = async (request, reply) => {
 	} catch (err) {
 		console.log(err)
 
-		const { code, data, message } = ResponseHelper.INTERNAL_SERVER_ERROR(err)
+		const { status, response } = ResponseHelper.INTERNAL_SERVER_ERROR(err)
 
-		reply.status(code).send({ code, data, message })
+		reply.status(status).send(response)
 	}
 }
 

@@ -1,3 +1,3 @@
-import { getRoot } from './rootController'
+import { getRoot } from './rootController.js'
 
 export { getRoot }

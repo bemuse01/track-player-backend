@@ -1,4 +1,7 @@
 {
+	"scripts": {
+		"start": "node src/app.js"
+	},
 	"dependencies": {
 		"@azure/identity": "^4.5.0",
 		"@azure/storage-blob": "^12.25.0",
@@ -20,7 +23,6 @@
 		"uuid": "^11.0.2"
 	},
 	"type": "module",
-	"main": "index.js",
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4"
 	}

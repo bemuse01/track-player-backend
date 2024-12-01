@@ -1,8 +1,24 @@
-import { deletePlaylist, insertOrUpdatePlaylist } from '../../models/playlist'
-import { deleteTracks, deleteTracksByPlaylistId, insertOrUpdateTracks } from '../../models/track'
+import { deletePlaylist, insertOrUpdatePlaylist } from '../../models/playlist/index.js'
+import {
+	deleteTracks,
+	deleteTracksByPlaylistId,
+	getAllTracksByPlaylistId,
+	insertOrUpdateTracks,
+} from '../../models/track/index.js'
 
 class DbWork {
 	// track
+	async getTracksByPlaylistId(playlistId) {
+		const tracks = await getAllTracksByPlaylistId(playlistId)
+
+		return tracks
+	}
+	async getTrackIdsByPlaylistId(playlistId) {
+		const tracks = await getAllTracksByPlaylistId(playlistId)
+		const trackIds = tracks.map((track) => track.track_id)
+
+		return trackIds
+	}
 	async upsertTracks(playlistId, tracks) {
 		await insertOrUpdateTracks(playlistId, tracks)
 	}
@@ -15,17 +31,13 @@ class DbWork {
 
 	// playlist
 	async upsertPlaylist(playlistId, playlistName, items) {
-		try {
-			const track_order = items.map((item) => item.videoId)
-			const playlist = {
-				_id: playlistId,
-				playlist_name: playlistName,
-				track_order,
-			}
-			await insertOrUpdatePlaylist(playlistId, playlist)
-		} catch (err) {
-			console.log(err)
+		const track_order = items.map((item) => item.videoId)
+		const playlist = {
+			_id: playlistId,
+			playlist_name: playlistName,
+			track_order,
 		}
+		await insertOrUpdatePlaylist(playlistId, playlist)
 	}
 	async deletePlaylist(playlistId) {
 		await deletePlaylist(playlistId)
