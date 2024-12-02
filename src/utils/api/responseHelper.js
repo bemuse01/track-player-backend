@@ -9,6 +9,9 @@ const defaultMessage = (status) => {
 		case 404: {
 			return 'Not Found.'
 		}
+		case 409: {
+			return 'Conflict.'
+		}
 		case 500: {
 			return 'Internal Server Error.'
 		}
@@ -30,6 +33,7 @@ const ResponseHelper = {
 	OK: (data, msg) => schema(200, data, msg),
 	NO_CONTENT: (msg) => schema(204, null, msg),
 	NOT_FOUND: (msg) => schema(404, null, msg),
+	CONFLICT: (msg) => schema(409, null, msg),
 	INTERNAL_SERVER_ERROR: (msg) => schema(500, null, msg),
 }
 
