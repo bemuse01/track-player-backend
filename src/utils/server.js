@@ -9,6 +9,7 @@ import playlistRoute from '../routes/playlist.js'
 import rootRoute from '../routes/root.js'
 import trackRoute from '../routes/track.js'
 import updateRoute from '../routes/update.js'
+import resourceRoute from '../routes/resource.js'
 import Storage from './api/storage.js'
 import Youtube from './api/youtube.js'
 import JobQueue from './scheduler/jobQueue.js'
@@ -56,6 +57,7 @@ class Server {
 		this.fastify.register(playlistRoute)
 		this.fastify.register(trackRoute)
 		this.fastify.register(updateRoute)
+		this.fastify.register(resourceRoute)
 	}
 
 	// awilix container

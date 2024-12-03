@@ -1,9 +1,12 @@
 import pLimit from 'p-limit'
 import { PROMISE_BATCH_SIZE } from '../../config/config.js'
-import { AUDIO_FORMAT, IMAGE_FORMAT } from '../../config/file.js'
+import { AUDIO_FLAG, AUDIO_FORMAT, IMAGE_FLAG, IMAGE_FORMAT } from '../../config/file.js'
 import { processAudio } from '../api/audio.js'
 import { processImage } from '../api/image.js'
 import { deleteFile } from '../api/local.js'
+import { THUMBNAIL_CONTAINER_NAME, AUDIO_CONTAINER_NAME } from '../../config/const.js'
+import { RESOURCE_API_ROUTE } from '../../config/route.js'
+import { createQuery } from '../api/helper.js'
 
 class StorageWork {
 	constructor(storage) {
@@ -38,18 +41,24 @@ class StorageWork {
 		const blobs = [
 			{
 				localPath: localImagePath,
-				containerName: process.env.THUMBNAIL_CONTAINER_NAME,
+				containerName: THUMBNAIL_CONTAINER_NAME,
 				// blobName: localImagePath.split('/').pop(),
 				blobName: videoId + '.' + IMAGE_FORMAT,
 			},
 			{
 				localPath: localAudioPath,
-				containerName: process.env.AUDIO_CONTAINER_NAME,
+				containerName: AUDIO_CONTAINER_NAME,
 				// blobName: localAudioPath.split('/').pop(),
 				blobName: videoId + '.' + AUDIO_FORMAT,
 			},
 		]
-		const [thumbnail_url, audio_url] = await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))
+		// const [thumbnail_url, audio_url] = await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))
+		await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))
+
+		// const thumbnail_url = RESOURCE_API_ROUTE + createQuery({ id: videoId, type: IMAGE_FLAG })
+		// const audio_url = RESOURCE_API_ROUTE + createQuery({ id: videoId, type: AUDIO_FLAG })
+		const thumbnail = { type: IMAGE_FLAG, name: 'track thumbnail' }
+		const audio = { type: AUDIO_FLAG, name: 'track audio' }
 
 		// delete local file
 		await Promise.all(blobs.map(({ localPath }) => deleteFile(localPath)))
@@ -59,8 +68,8 @@ class StorageWork {
 			artist,
 			title,
 			main_color,
-			thumbnail_url,
-			audio_url,
+			thumbnail,
+			audio,
 		}
 	}
 
@@ -79,11 +88,11 @@ class StorageWork {
 
 		const blobs = [
 			{
-				containerName: process.env.THUMBNAIL_CONTAINER_NAME,
+				containerName: THUMBNAIL_CONTAINER_NAME,
 				blobName: trackId + '.' + IMAGE_FORMAT,
 			},
 			{
-				containerName: process.env.AUDIO_CONTAINER_NAME,
+				containerName: AUDIO_CONTAINER_NAME,
 				blobName: trackId + '.' + AUDIO_FORMAT,
 			},
 		]

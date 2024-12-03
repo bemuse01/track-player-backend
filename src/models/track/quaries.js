@@ -46,4 +46,15 @@ const deleteTracksByPlaylistId = async (playlistId) => {
 	}
 }
 
-export { getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId }
+const getTrackById = async (trackId) => {
+	try {
+		const query = { track_id: trackId }
+		const track = await Track.findOne(query)
+
+		return track
+	} catch (err) {
+		console.log(err)
+	}
+}
+
+export { getAllTracksByPlaylistId, insertOrUpdateTracks, deleteTracks, deleteTracksByPlaylistId, getTrackById }

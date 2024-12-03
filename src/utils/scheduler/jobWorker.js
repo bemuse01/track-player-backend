@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { PLAYLIST_IDS } from '../../config/urls.js'
+import { PLAYLIST_IDS } from '../../config/config.js'
 import DbWork from './dbWork.js'
 import LocalWork from './localWork.js'
 import StorageWork from './storageWork.js'
