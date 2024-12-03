@@ -96,6 +96,8 @@ class JobWorker {
 		}
 	}
 
+	// TODO 수정 필요. 같은 playlistid를 가진 트랙이 아직 존재하면(지워질 필요가 없는 플레이리스트에 똑같은 트랙이 있다면) 스토리지에서 썸네일과 오디오 파일을 지우면 안됨.
+	// TODO lookup으로 조인하는 것보다 콜렉션을 하나 더 만들어서 해결하는게 쉬워 보임.
 	// delete all tracks in db, storage if playlist deleted in youtube
 	async delete() {
 		console.log('delete start')

@@ -19,6 +19,7 @@ class DbWork {
 
 		return trackIds
 	}
+	async getTrackIdsWithCommonPlaylistId(trackIds) {}
 	async upsertTracks(playlistId, tracks) {
 		await insertOrUpdateTracks(playlistId, tracks)
 	}
