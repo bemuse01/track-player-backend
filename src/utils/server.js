@@ -2,7 +2,7 @@ import { diContainer, fastifyAwilixPlugin } from '@fastify/awilix'
 import fastifyFormbody from '@fastify/formbody'
 import { Lifetime, asClass, asFunction, asValue } from 'awilix'
 import Fastify from 'fastify'
-import { corsOption, fastifyCors } from '../plugins/cors.js'
+// import { corsOption, fastifyCors } from '../plugins/cors.js'
 import mongoConnector from '../plugins/mongoConnector.js'
 import redisConnector from '../plugins/redisConnector.js'
 import playlistRoute from '../routes/playlist.js'
@@ -46,7 +46,7 @@ class Server {
 			disposeOnResponse: true,
 			strictBooleanEnforced: true,
 		})
-		this.fastify.register(fastifyCors, corsOption)
+		// this.fastify.register(fastifyCors, corsOption)
 	}
 	// routes
 	registerRoutes() {
