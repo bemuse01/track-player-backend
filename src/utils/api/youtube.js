@@ -14,7 +14,7 @@ class Youtube {
 
 	async getDataFromYoutube(playlistId) {
 		try {
-			const { playlist_name, playlist_id, error } = await this.getPlaylistInfo(playlistId)
+			const { playlist_name, playlist_id, error } = await this.getPlaylist(playlistId)
 
 			if (error) return { error }
 
@@ -29,7 +29,7 @@ class Youtube {
 			console.log(err)
 		}
 	}
-	async getPlaylistInfo(playlistId) {
+	async getPlaylist(playlistId) {
 		try {
 			const { youtube } = this
 

@@ -1,14 +1,4 @@
-import mongoose from 'mongoose'
+import { UniqueTrack } from './model'
+import { upsertUTracks, deleteTransactionUtracks } from './quaries'
 
-const uniqueTrackSchema = new mongoose.Schema({
-	_id: { type: String, required: true, trim: true },
-	playlists: { type: Array, default: [] },
-})
-uniqueTrackSchema.set('timestamps', {
-	createdAt: 'created_at',
-	updatedAt: 'updated_at',
-})
-
-const uniqueTrack = new mongoose.model('uniqueTrack', uniqueTrackSchema)
-
-export { uniqueTrack }
+export { UniqueTrack, upsertUTracks, deleteTransactionUtracks }

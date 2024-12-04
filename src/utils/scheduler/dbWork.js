@@ -5,6 +5,7 @@ import {
 	getAllTracksByPlaylistId,
 	insertOrUpdateTracks,
 } from '../../models/track/index.js'
+import { upsertUTracks, deleteTransactionUTracks, deleteUTracksIfNoPlaylists } from '../../models/uniqueTrack/index.js'
 
 class DbWork {
 	// track
@@ -41,6 +42,19 @@ class DbWork {
 	}
 	async deletePlaylist(playlistId) {
 		await deletePlaylist(playlistId)
+	}
+
+	// unique track
+	async deleteUTracksIfNoPlaylists() {
+		const uTrackIds = await deleteUTracksIfNoPlaylists()
+		return uTrackIds
+	}
+	async upsertUTracks(playlistId, utracks) {
+		await upsertUTracks(playlistId, utracks)
+	}
+	async deleteTransactionUTracks(playlistId, uTrackIds) {
+		const deletedUtrackIds = await deleteTransactionUTracks(playlistId, uTrackIds)
+		return deletedUtrackIds
 	}
 }
 

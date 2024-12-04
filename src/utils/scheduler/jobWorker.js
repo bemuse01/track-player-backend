@@ -58,18 +58,20 @@ class JobWorker {
 				return
 			}
 
-			// insert data to db and upload track thumbnail, audio file
-			// playlist
+			// 삽입 작업
+			// 플레이리스트
 			await dbWork.upsertPlaylist(playlistId, playlistName, items)
-			// track
+			// 트랙
 			const tracks = await storageWork.uploadTrackFilesByBatch(playlistId, tracksToInsert)
 			await dbWork.upsertTracks(playlistId, tracks)
+			// 유니크 트랙
+			await dbWork.upsertUTracks(playlistId, tracks)
 		} catch (err) {
 			console.log(err)
 		}
 	}
 
-	// update db if tracks not in youtube playlist
+	// 유튜브의 플레이리스트의 내용이 업데이트 되면 실행되는 작업 메소드
 	async update() {
 		console.log('update start')
 		await Promise.all(this.playlistIds.map((pid) => this.updateWorks(pid)))
@@ -79,26 +81,27 @@ class JobWorker {
 		try {
 			const { youtube, dbWork, storageWork } = this
 
-			// filter tracks not in youtube playlist
+			// 유튜브 플레이리스트에 있는 하나 혹은 여럿의 트랙이 이동, 삭제 됐을 경우,
+			// DB에 있는 트랙과 비교해서 필터링
 			const { playlistId, playlistName, items } = await youtube.getDataFromYoutube(pid)
 			const trackIdsInYT = items.map((item) => item.videoId)
 			const trackIdsInDB = await dbWork.getTrackIdsByPlaylistId(pid)
 			const trackIdsToDelete = _.difference(trackIdsInDB, trackIdsInYT)
 
-			// update playlist track order and delete tracks from db and storage
-			// playlist
+			// 업데이트 작업
+			// 필터링된 트랙 아이디로 유니크 트랙 삭제 트랜잭션 작업 후 삭제된 아이디 반환
+			await dbWork.deleteTransactionUTracks(pid, trackIdsToDelete)
+
+			// 필터링된 트랙으로 플레이리스트 DB 정보를 변경, 트랙 삭제
 			await dbWork.upsertPlaylist(playlistId, playlistName, items)
-			// track
 			await dbWork.deleteTracks(trackIdsToDelete)
-			await storageWork.deleteTrackFilesByBatch(trackIdsToDelete)
 		} catch (err) {
 			console.log(err)
 		}
 	}
 
-	// TODO 수정 필요. 같은 playlistid를 가진 트랙이 아직 존재하면(지워질 필요가 없는 플레이리스트에 똑같은 트랙이 있다면) 스토리지에서 썸네일과 오디오 파일을 지우면 안됨.
-	// TODO lookup으로 조인하는 것보다 콜렉션을 하나 더 만들어서 해결하는게 쉬워 보임.
-	// delete all tracks in db, storage if playlist deleted in youtube
+	// 처음 실행되는 삭제 작업 메소드
+	// 해당 플레이리스트가 유튜브에 더 이상 존재하지 않으면 DB와 storage에서 삭제
 	async delete() {
 		console.log('delete start')
 		const currentPlaylistIds = [...this.playlistIds]
@@ -109,41 +112,50 @@ class JobWorker {
 		try {
 			const { youtube, dbWork, storageWork } = this
 
-			//
-			const { error } = await youtube.getDataFromYoutube(pid)
+			// 작업 전 에러 처리
+			// 유튜브에 해당 플레이리스트 존재 유무 판별
+			const { error } = await youtube.getPlaylist(pid)
 
-			// return if no error
-			if (!error) return
+			// 플레이리스트가 유튜브에 없으면 작업 건너뜀
+			if (!error) {
+				console.log(`Invalid playlist from youtube: ${pid}, skip delete`)
+				this.filterPlaylistIds(pid)
+				return
+			}
 
-			//
-			const trackIds = await dbWork.getTrackIdsByPlaylistId(pid)
+			// 삭제 작업
+			// 플레이리스트 아이디로 유니크 트랙 삭제 트랜잭션 작업 후 삭제된 아이디 반환
+			await dbWork.deleteTransactionUTracks(pid)
 
-			// delete playlist and tracks if playlist not found or deleted in youtube
-			// playlist
+			// DB 트랙, 플레이리스트 삭제 작업
 			await dbWork.deletePlaylist(pid)
-			// track
 			await dbWork.deleteTracksByPlaylistId(pid)
-			await storageWork.deleteTrackFilesByBatch(trackIds)
 
-			// filter playlist ids if delete work done
-			this.playlistIds = this.playlistIds.filter((id) => id !== pid)
-			console.log(this.playlistIds)
+			// 삭제 작업 완료 후 플레이리스트 배열 필터링
+			this.filterPlaylistIds(pid)
 		} catch (err) {
 			console.log(err)
 		}
 	}
+	filterPlaylistIds(pid) {
+		this.playlistIds = this.playlistIds.filter((id) => id !== pid)
+	}
 
-	// when all works end
+	// 모든 작업 메소드 완료 후 실행되는 마무리 작업 메소드
 	async end() {
 		console.log('end start')
 		await Promise.all(this.playlistIds.map((pid) => this.endWorks(pid)))
 		console.log('end done')
 	}
 	async endWorks() {
-		const { localWork } = this
+		const { localWork, storageWork, dbWork } = this
 
-		// delete playlist dirs by deleting audio, images dir
+		// 임시 assets 로컬 폴더 삭제
 		await localWork.deleteAssets()
+
+		// playlists 필드(array 타입)에 배열 길이가 0인 유니크 트랙일 경우 DB와 storage에서 삭제
+		const deletedUtrackIds = await dbWork.deleteUTracksIfNoPlaylists()
+		await storageWork.deleteTrackFilesByBatch(deletedUtrackIds)
 	}
 
 	dispose() {}
