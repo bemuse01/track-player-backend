@@ -28,6 +28,8 @@ const upsertUTracks = async (pid, uTracks) => {
 							},
 						},
 						_id: { $ifNull: ['$_id', uTrack.track_id] },
+						created_at: { $ifNull: ['$created_at', new Date()] },
+						updated_at: new Date(),
 					},
 				},
 			],
