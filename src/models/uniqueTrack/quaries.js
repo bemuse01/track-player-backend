@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { UniqueTrack } from './model'
+import { UniqueTrack } from './model.js'
 
 const upsertUTracks = async (pid, uTracks) => {
 	// const filter = { _id: { $in: trackIds } }
@@ -9,13 +9,28 @@ const upsertUTracks = async (pid, uTracks) => {
 	const queries = uTracks.map((uTrack) => ({
 		updateOne: {
 			filter: { _id: uTrack.track_id },
-			update: {
-				$addToSet: { playlists: pid },
-				$setOnInsert: {
-					_id: uTrack.track_id,
-					playlists: [pid],
+			update: [
+				{
+					// $addToSet: { playlists: pid },
+					// $setOnInsert: {
+					// 	_id: uTrack.track_id,
+					// 	playlists: [pid],
+					// },
+					$set: {
+						playlists: {
+							$cond: {
+								if: {
+									$eq: [{ $size: { $ifNull: ['$playlists', []] } }, 0],
+								},
+								// biome-ignore lint/suspicious/noThenProperty: <explanation>
+								then: [pid],
+								else: { $setUnion: ['$playlists', [pid]] },
+							},
+						},
+						_id: { $ifNull: ['$_id', uTrack.track_id] },
+					},
 				},
-			},
+			],
 			upsert: true,
 		},
 	}))
@@ -47,7 +62,7 @@ const deleteUTracksIfNoPlaylists = async () => {
 	return uTrackIdsToDelete
 }
 
-const deleteTransactionUtracks = async (pid, uTrackIds) => {
+const deleteTransactionUTracks = async (pid, uTrackIds) => {
 	const session = await mongoose.startSession()
 
 	try {
@@ -76,4 +91,4 @@ const deleteTransactionUtracks = async (pid, uTrackIds) => {
 	}
 }
 
-export { upsertUTracks, deleteUTracksIfNoPlaylists, deleteTransactionUtracks }
+export { upsertUTracks, deleteUTracksIfNoPlaylists, deleteTransactionUTracks }

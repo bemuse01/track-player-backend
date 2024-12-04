@@ -1,4 +1,4 @@
-import { UniqueTrack } from './model'
-import { upsertUTracks, deleteTransactionUtracks } from './quaries'
+import { UniqueTrack } from './model.js'
+import { upsertUTracks, deleteUTracksIfNoPlaylists, deleteTransactionUTracks } from './quaries.js'
 
-export { UniqueTrack, upsertUTracks, deleteTransactionUtracks }
+export { UniqueTrack, upsertUTracks, deleteUTracksIfNoPlaylists, deleteTransactionUTracks }

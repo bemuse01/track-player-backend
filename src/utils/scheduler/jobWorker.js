@@ -34,7 +34,7 @@ class JobWorker {
 		await redis.set('isWorking', 'false')
 	}
 
-	// insert and upload tracks, playlist
+	// 삽입 작업
 	async insert() {
 		console.log('insert start')
 		await Promise.all(this.playlistIds.map((pid) => this.insertWorks(pid)))
@@ -44,15 +44,15 @@ class JobWorker {
 		try {
 			const { youtube, dbWork, storageWork } = this
 
-			// get playlist and tracks info from youtube
+			// 유튜브 API로 부터 플레이리스트와 트랙 정보를 로드
 			const { playlistName, playlistId, items } = await youtube.getDataFromYoutube(pid)
 
-			// filter tracks already in db
+			// DB의 트랙과 유튜브 플레이리스트의 트랙과 비교해서 삽입할 트랙을 필터링
 			const tracksInYT = items
 			const tracksInDB = await dbWork.getTracksByPlaylistId(pid)
 			const tracksToInsert = _.differenceWith(tracksInYT, tracksInDB, (x, y) => x.videoId === y.track_id)
 
-			// stop to insert if no change anything
+			// 필터링된 트랙에 아무것도 없으면(변한게 없으면) 삽입 작업을 건너뜀
 			if (tracksToInsert.length === 0) {
 				console.log('stop insert')
 				return
@@ -79,7 +79,7 @@ class JobWorker {
 	}
 	async updateWorks(pid) {
 		try {
-			const { youtube, dbWork, storageWork } = this
+			const { youtube, dbWork } = this
 
 			// 유튜브 플레이리스트에 있는 하나 혹은 여럿의 트랙이 이동, 삭제 됐을 경우,
 			// DB에 있는 트랙과 비교해서 필터링
@@ -110,16 +110,15 @@ class JobWorker {
 	}
 	async deleteWorks(pid) {
 		try {
-			const { youtube, dbWork, storageWork } = this
+			const { youtube, dbWork } = this
 
 			// 작업 전 에러 처리
 			// 유튜브에 해당 플레이리스트 존재 유무 판별
 			const { error } = await youtube.getPlaylist(pid)
 
-			// 플레이리스트가 유튜브에 없으면 작업 건너뜀
+			// 플레이리스트가 유튜브에 있으면 작업 건너뜀
 			if (!error) {
-				console.log(`Invalid playlist from youtube: ${pid}, skip delete`)
-				this.filterPlaylistIds(pid)
+				console.log(`valid playlist from youtube: ${pid}, skip delete`)
 				return
 			}
 
