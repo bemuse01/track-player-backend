@@ -1,6 +1,6 @@
 import { IMAGE_FLAG, AUDIO_FLAG, IMAGE_FORMAT, AUDIO_FORMAT } from '../../config/file.js'
 import { THUMBNAIL_CONTAINER_NAME, AUDIO_CONTAINER_NAME } from '../../config/const.js'
-import { getTrackById } from '../../models/track/quaries.js'
+import { getTrackById } from '../../models/track/index.js'
 import ResponseHelper from '../../utils/api/responseHelper.js'
 
 const method = 'GET'
@@ -61,7 +61,7 @@ const handler = async (request, reply) => {
 
 		const storage = request.diScope.resolve('storage')
 
-		const track = getTrackById(id)
+		const track = await getTrackById(id)
 		const url = await getUrl({ storage, id, type })
 
 		if (!track || !url) {
