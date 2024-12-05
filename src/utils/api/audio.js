@@ -1,5 +1,5 @@
-import { spawn } from 'child_process'
-import { mkdir } from 'fs/promises'
+import { spawn } from 'node:child_process'
+import { mkdir } from 'node:fs/promises'
 import { AUDIO_FORMAT } from '../../config/file.js'
 import { AUDIO_SAVE_PATH } from '../../config/urls.js'
 
