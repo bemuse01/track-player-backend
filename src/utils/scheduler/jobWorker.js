@@ -52,7 +52,13 @@ class JobWorker {
 			const { youtube, dbWork, storageWork } = this
 
 			// 유튜브 API로 부터 플레이리스트와 트랙 정보를 로드
-			const { playlistName, playlistId, items } = await youtube.getDataFromYoutube(pid)
+			const { playlistName, playlistId, items, error } = await youtube.getDataFromYoutube(pid)
+
+			// 에러 처리
+			if (error) {
+				console.log(`invalid playlist from youtube: ${pid}, skip insert`)
+				return
+			}
 
 			// DB의 트랙과 유튜브 플레이리스트의 트랙과 비교해서 삽입할 트랙을 필터링
 			const tracksInYT = items
@@ -90,7 +96,14 @@ class JobWorker {
 
 			// 유튜브 플레이리스트에 있는 하나 혹은 여럿의 트랙이 이동, 삭제 됐을 경우,
 			// DB에 있는 트랙과 비교해서 필터링
-			const { playlistId, playlistName, items } = await youtube.getDataFromYoutube(pid)
+			const { playlistId, playlistName, items, error } = await youtube.getDataFromYoutube(pid)
+
+			// 에러 처리
+			if (error) {
+				console.log(`invalid playlist from youtube: ${pid}, skip update`)
+				return
+			}
+
 			const trackIdsInYT = items.map((item) => item.videoId)
 			const trackIdsInDB = await dbWork.getTrackIdsByPlaylistId(pid)
 			const trackIdsToDelete = _.difference(trackIdsInDB, trackIdsInYT)
