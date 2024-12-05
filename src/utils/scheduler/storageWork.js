@@ -78,7 +78,7 @@ class StorageWork {
 		// process promises by batch
 		const { limit } = this
 
-		const limits = trackIds.map((trackId) => limit(() => this.deleteTrackFiles(trackId)))
+		const limits = trackIds.map(({ _id }) => limit(() => this.deleteTrackFiles(_id)))
 
 		// wait all batch
 		await Promise.all(limits)

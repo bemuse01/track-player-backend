@@ -10,6 +10,17 @@ const getAllPlaylists = async () => {
 	}
 }
 
+const getAllPlaylistIds = async () => {
+	try {
+		const playlistIds = await Playlist.find({}, '_id').lean()
+
+		return playlistIds
+	} catch (err) {
+		console.log(err)
+		return []
+	}
+}
+
 const insertOrUpdatePlaylist = async (playlistId, playlist) => {
 	try {
 		const query = { _id: playlistId }
@@ -43,4 +54,4 @@ const findPlaylist = async (playlistId) => {
 	}
 }
 
-export { insertOrUpdatePlaylist, getAllPlaylists, deletePlaylist, findPlaylist }
+export { insertOrUpdatePlaylist, getAllPlaylists, getAllPlaylistIds, deletePlaylist, findPlaylist }

@@ -1,4 +1,4 @@
-import { deletePlaylist, insertOrUpdatePlaylist } from '../../models/playlist/index.js'
+import { deletePlaylist, insertOrUpdatePlaylist, getAllPlaylistIds } from '../../models/playlist/index.js'
 import {
 	deleteTracks,
 	deleteTracksByPlaylistId,
@@ -42,6 +42,9 @@ class DbWork {
 	}
 	async deletePlaylist(playlistId) {
 		await deletePlaylist(playlistId)
+	}
+	async getAllPlaylistIds() {
+		return await getAllPlaylistIds()
 	}
 
 	// unique track

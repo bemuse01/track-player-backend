@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { PLAYLIST_IDS } from '../../config/config.js'
+import fetchData from '../api/fetchData.js'
 import DbWork from './dbWork.js'
 import LocalWork from './localWork.js'
 import StorageWork from './storageWork.js'
@@ -10,7 +10,7 @@ class JobWorker {
 		this.youtube = youtube
 		this.storage = storage
 
-		this.playlistIds = PLAYLIST_IDS
+		this.playlistIds = []
 
 		this.dbWork = new DbWork()
 		this.storageWork = new StorageWork(storage)
@@ -26,12 +26,19 @@ class JobWorker {
 
 		await redis.set('isWorking', 'true')
 
+		await this.loadPlaylistData()
 		await this.delete()
 		await this.update()
 		await this.insert()
 		await this.end()
 
 		await redis.set('isWorking', 'false')
+	}
+
+	// 플레이리스트 데이터 파일 로드
+	async loadPlaylistData() {
+		const data = await fetchData()
+		this.playlistIds = data.map((item) => item.id)
 	}
 
 	// 삽입 작업
@@ -92,7 +99,7 @@ class JobWorker {
 			// 필터링된 트랙 아이디로 유니크 트랙 삭제 트랜잭션 작업 후 삭제된 아이디 반환
 			await dbWork.deleteTransactionUTracks(pid, trackIdsToDelete)
 
-			// 필터링된 트랙으로 플레이리스트 DB 정보를 변경, 트랙 삭제
+			// 필터링된 트랙으로 트랙 DB 삭제, 플레이리스트 트랙 순서 업데이트
 			await dbWork.upsertPlaylist(playlistId, playlistName, items)
 			await dbWork.deleteTracks(trackIdsToDelete)
 		} catch (err) {
@@ -102,9 +109,12 @@ class JobWorker {
 
 	// 처음 실행되는 삭제 작업 메소드
 	// 해당 플레이리스트가 유튜브에 더 이상 존재하지 않으면 DB와 storage에서 삭제
+	// DB의 플레이리스트와 JSON 데이터의 플레이리스트가 일치하지 않을수도 있으므로 DB에 있는 플레이리스트를 기준으로 유무 검사
 	async delete() {
 		console.log('delete start')
-		const currentPlaylistIds = [...this.playlistIds]
+		const playlistIds = await this.getPlaylistIds()
+		console.log('playlists in db: ', playlistIds)
+		const currentPlaylistIds = playlistIds.length === 0 ? [...this.playlistIds] : playlistIds
 		await Promise.all(currentPlaylistIds.map((pid) => this.deleteWorks(pid)))
 		console.log('delete done')
 	}
@@ -136,6 +146,11 @@ class JobWorker {
 			console.log(err)
 		}
 	}
+	async getPlaylistIds() {
+		const { dbWork } = this
+		const result = await dbWork.getAllPlaylistIds()
+		return result.map((item) => item._id)
+	}
 	filterPlaylistIds(pid) {
 		this.playlistIds = this.playlistIds.filter((id) => id !== pid)
 	}
@@ -143,7 +158,7 @@ class JobWorker {
 	// 모든 작업 메소드 완료 후 실행되는 마무리 작업 메소드
 	async end() {
 		console.log('end start')
-		await Promise.all(this.playlistIds.map((pid) => this.endWorks(pid)))
+		await this.endWorks()
 		console.log('end done')
 	}
 	async endWorks() {
@@ -154,6 +169,7 @@ class JobWorker {
 
 		// playlists 필드(array 타입)에 배열 길이가 0인 유니크 트랙일 경우 DB와 storage에서 삭제
 		const deletedUtrackIds = await dbWork.deleteUTracksIfNoPlaylists()
+		console.log(deletedUtrackIds)
 		await storageWork.deleteTrackFilesByBatch(deletedUtrackIds)
 	}
 

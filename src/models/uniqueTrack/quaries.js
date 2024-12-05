@@ -17,6 +17,8 @@ const upsertUTracks = async (pid, uTracks) => {
 					// 	playlists: [pid],
 					// },
 					$set: {
+						title: uTrack.title,
+						artist: uTrack.artist,
 						playlists: {
 							$cond: {
 								if: {
