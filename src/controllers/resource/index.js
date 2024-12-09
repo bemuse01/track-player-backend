@@ -1,3 +1,3 @@
-import { resource } from './resource.js'
+import { getResource } from './resource.js'
 
-export { resource }
+export { getResource }

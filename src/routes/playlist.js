@@ -1,7 +1,7 @@
-import { getPlaylists } from '../controllers/playlist/index.js'
+import { getPlaylist } from '../controllers/playlist/index.js'
 
 const playlist = async (fastify, options) => {
-	fastify.route(getPlaylists)
+	fastify.route(getPlaylist)
 }
 
 export default playlist

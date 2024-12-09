@@ -55,11 +55,11 @@ const handler = async (request, reply) => {
 	}
 }
 
-const trackPlaylistId = {
+const postTrackPlaylistId = {
 	method,
 	url,
 	schema,
 	handler,
 }
 
-export { trackPlaylistId }
+export { postTrackPlaylistId }

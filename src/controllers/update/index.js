@@ -1,3 +1,3 @@
-import { update } from './update.js'
+import { postUpdate } from './update.js'
 
-export { update }
+export { postUpdate }

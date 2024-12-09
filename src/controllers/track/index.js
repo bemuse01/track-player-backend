@@ -1,3 +1,4 @@
-import { getTracks } from './track.playlistid.js'
+import { postTrackPlaylistId } from './track.playlistid.js'
+import { postTrackLimit } from './track.limit.js'
 
-export { getTracks }
+export { postTrackPlaylistId, postTrackLimit }

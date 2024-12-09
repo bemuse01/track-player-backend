@@ -1,7 +1,7 @@
-import { updateData } from '../controllers/update/index.js'
+import { postUpdate } from '../controllers/update/index.js'
 
 const update = async (fastify, options) => {
-	fastify.route(updateData(fastify))
+	fastify.route(postUpdate(fastify))
 }
 
 export default update

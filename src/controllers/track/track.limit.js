@@ -1,6 +1,6 @@
 // TODO 무한 스크롤 데이터 로딩 구현
 import { findPlaylist } from '../../models/playlist/index.js'
-import { getAllTracksByPlaylistId } from '../../models/track/index.js'
+import { getTracksByLimit } from '../../models/track/index.js'
 import ResponseHelper from '../../utils/api/responseHelper.js'
 
 const method = 'POST'
@@ -31,7 +31,7 @@ const schema = {
 
 const handler = async (request, reply) => {
 	try {
-		const { playlistId, lastTrackId } = request.params
+		const { playlistId, lastTrackId } = request.body
 		console.log(playlistId, lastTrackId)
 
 		const playlist = await findPlaylist(playlistId)
@@ -41,7 +41,9 @@ const handler = async (request, reply) => {
 
 			reply.status(status).send(response)
 		} else {
-			const tracks = await getAllTracksByPlaylistId(playlistId)
+			const tracks = await getTracksByLimit(playlistId, lastTrackId)
+
+			console.log(tracks)
 
 			const { status, response } = ResponseHelper.OK(tracks)
 
@@ -56,11 +58,11 @@ const handler = async (request, reply) => {
 	}
 }
 
-const trackLimit = {
+const postTrackLimit = {
 	method,
 	url,
 	schema,
 	handler,
 }
 
-export { trackLimit }
+export { postTrackLimit }

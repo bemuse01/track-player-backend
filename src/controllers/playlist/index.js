@@ -1,3 +1,3 @@
-import { playlist } from './playlist.js'
+import { getPlaylist } from './playlist.js'
 
-export { playlist }
+export { getPlaylist }

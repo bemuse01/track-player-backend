@@ -65,7 +65,7 @@ const handler = async (request, reply) => {
 		const url = await getUrl({ storage, id, type })
 
 		if (!track || !url) {
-			const { status, response } = ResponseHelper.NOT_FOUND()
+			const { status, response } = ResponseHelper.NOT_FOUND(`Resouce Not Found: ${type}`)
 
 			reply.status(status).send(response)
 		} else {
@@ -82,6 +82,6 @@ const handler = async (request, reply) => {
 	}
 }
 
-const resource = { method, url, schema, handler }
+const getResource = { method, url, schema, handler }
 
-export { resource }
+export { getResource }
