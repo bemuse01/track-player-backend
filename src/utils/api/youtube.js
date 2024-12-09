@@ -4,6 +4,7 @@ import { YOUTUBE_BASE_URL } from '../../config/urls.js'
 import { replaceText } from './helper.js'
 import 'dotenv/config'
 
+// TODO 너무 긴 유튜브 영상 제외 (10분 이상 제외)
 class Youtube {
 	constructor() {
 		this.youtube = google.youtube({
