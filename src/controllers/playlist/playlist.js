@@ -41,6 +41,6 @@ const handler = async (request, reply) => {
 	}
 }
 
-const getPlaylists = { method, url, schema, handler }
+const playlist = { method, url, schema, handler }
 
-export { getPlaylists }
+export { playlist }

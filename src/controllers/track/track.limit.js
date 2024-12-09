@@ -1,9 +1,10 @@
+// TODO 무한 스크롤 데이터 로딩 구현
 import { findPlaylist } from '../../models/playlist/index.js'
 import { getAllTracksByPlaylistId } from '../../models/track/index.js'
 import ResponseHelper from '../../utils/api/responseHelper.js'
 
 const method = 'POST'
-const url = '/track/:playlistId'
+const url = '/track/limit'
 const responseSchema = {
 	type: 'object',
 	properties: {
@@ -30,8 +31,8 @@ const schema = {
 
 const handler = async (request, reply) => {
 	try {
-		const { playlistId } = request.params
-		console.log(playlistId)
+		const { playlistId, lastTrackId } = request.params
+		console.log(playlistId, lastTrackId)
 
 		const playlist = await findPlaylist(playlistId)
 
@@ -55,11 +56,11 @@ const handler = async (request, reply) => {
 	}
 }
 
-const getTracks = {
+const trackLimit = {
 	method,
 	url,
 	schema,
 	handler,
 }
 
-export { getTracks }
+export { trackLimit }

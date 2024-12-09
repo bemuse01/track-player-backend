@@ -58,11 +58,11 @@ const handler = (fastify) => async (request, reply) => {
 	}
 }
 
-const updateData = (fastify) => ({
+const update = (fastify) => ({
 	method,
 	url,
 	schema,
 	handler: handler(fastify),
 })
 
-export { updateData }
+export { update }

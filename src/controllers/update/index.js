@@ -1,3 +1,3 @@
-import { updateData } from './updateController.js'
+import { update } from './update.js'
 
-export { updateData }
+export { update }

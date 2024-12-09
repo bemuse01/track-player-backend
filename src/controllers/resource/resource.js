@@ -82,6 +82,6 @@ const handler = async (request, reply) => {
 	}
 }
 
-const getResource = { method, url, schema, handler }
+const resource = { method, url, schema, handler }
 
-export { getResource }
+export { resource }
