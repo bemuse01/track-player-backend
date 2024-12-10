@@ -36,8 +36,7 @@ const getAllPlaylistIds = async () => {
 const getPlaylistsByLimit = async (lastObjectId = null) => {
 	try {
 		const query = lastObjectId ? { _id: { $gte: mongoose.Types.ObjectId.createFromHexString(lastObjectId) } } : {}
-		// const playlists = await Playlist.find(query).sort({ _id: -1 }).limit(DATA_LOAD_LIMIT)
-		const playlists = await Playlist.find(query).sort({ _id: 1 }).limit(12)
+		const playlists = await Playlist.find(query).sort({ _id: 1 }).limit(DATA_LOAD_LIMIT)
 
 		// console.log(lastObjectId, playlists)
 
