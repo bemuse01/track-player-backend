@@ -1,3 +1,4 @@
+// TODO 사용자 수동 업데이트: 전체 리스트 업데이트에서 개별 리스트 업데이트로 변경
 // import { readFile } from 'node:fs/promises'
 import { getAllPlaylists } from '../../models/playlist/index.js'
 import ResponseHelper from '../../utils/api/responseHelper.js'

@@ -1,3 +1,4 @@
+import { QUEUE_REPEAT_TIME } from '../../config/config'
 import { Queue, Worker } from 'bullmq'
 import 'dotenv/config'
 
@@ -44,7 +45,7 @@ class JobQueue {
 	// scheduler
 	initScheduler() {
 		this.schedulerOption = {
-			every: 1000 * 60 * 60 * 1, // every 1 hour
+			every: QUEUE_REPEAT_TIME, // every 1 hour
 			// every: 1000,
 			immediately: true,
 		}

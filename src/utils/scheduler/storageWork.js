@@ -5,8 +5,6 @@ import { processAudio } from '../api/audio.js'
 import { processImage } from '../api/image.js'
 import { deleteFile } from '../api/local.js'
 import { THUMBNAIL_CONTAINER_NAME, AUDIO_CONTAINER_NAME } from '../../config/const.js'
-import { RESOURCE_API_ROUTE } from '../../config/route.js'
-import { createQuery } from '../api/helper.js'
 
 class StorageWork {
 	constructor(storage) {
@@ -55,8 +53,6 @@ class StorageWork {
 		// const [thumbnail_url, audio_url] = await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))
 		await Promise.all(blobs.map((blob) => storage.uploadBlob(blob)))
 
-		// const thumbnail_url = RESOURCE_API_ROUTE + createQuery({ id: videoId, type: IMAGE_FLAG })
-		// const audio_url = RESOURCE_API_ROUTE + createQuery({ id: videoId, type: AUDIO_FLAG })
 		const thumbnail = { type: IMAGE_FLAG, name: 'track thumbnail' }
 		const audio = { type: AUDIO_FLAG, name: 'track audio' }
 
