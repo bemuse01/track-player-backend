@@ -1,4 +1,4 @@
-import { QUEUE_REPEAT_TIME } from '../../config/config'
+import { QUEUE_REPEAT_TIME } from '../../config/config.js'
 import { Queue, Worker } from 'bullmq'
 import 'dotenv/config'
 

@@ -16,8 +16,6 @@ import JobQueue from './scheduler/jobQueue.js'
 import JobWorker from './scheduler/jobWorker.js'
 import 'dotenv/config'
 
-// TODO need to serve resources(image, audio file) from backend, by using SAS token or some ways.
-
 class Server {
 	constructor() {
 		this.host = process.env.SERVER_HOST

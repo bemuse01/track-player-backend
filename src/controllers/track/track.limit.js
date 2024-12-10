@@ -31,7 +31,7 @@ const schema = {
 const handler = async (request, reply) => {
 	try {
 		const { playlistId, lastTrackId } = request.body
-		console.log(playlistId, lastTrackId)
+		// console.log(playlistId, lastTrackId)
 
 		const playlist = await findPlaylist(playlistId)
 
@@ -42,7 +42,7 @@ const handler = async (request, reply) => {
 		} else {
 			const tracks = await getTracksByLimit(playlistId, lastTrackId)
 
-			console.log(tracks)
+			// console.log(tracks)
 
 			const { status, response } = ResponseHelper.OK(tracks)
 

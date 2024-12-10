@@ -4,6 +4,8 @@ import DbWork from './dbWork.js'
 import LocalWork from './localWork.js'
 import StorageWork from './storageWork.js'
 
+// TODO 전 작업 p-limit으로 제한
+
 class JobWorker {
 	constructor({ fastify, storage, youtube }) {
 		this.fastify = fastify
@@ -162,7 +164,7 @@ class JobWorker {
 	async getPlaylistIds() {
 		const { dbWork } = this
 		const result = await dbWork.getAllPlaylistIds()
-		return result.map((item) => item._id)
+		return result.map((item) => item.playlist_id)
 	}
 	filterPlaylistIds(pid) {
 		this.playlistIds = this.playlistIds.filter((id) => id !== pid)

@@ -12,7 +12,7 @@ class Youtube {
 			version: 'v3',
 			auth: process.env.YOUTUBE_API_KEY,
 		})
-		this.maxChunk = 5
+		this.maxChunk = 50
 		this.limit = pLimit(PROMISE_BATCH_SIZE)
 	}
 

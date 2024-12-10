@@ -34,7 +34,7 @@ class DbWork {
 	async upsertPlaylist(playlistId, playlistName, items) {
 		const track_order = items.map((item) => item.videoId)
 		const playlist = {
-			_id: playlistId,
+			playlist_id: playlistId,
 			playlist_name: playlistName,
 			track_order,
 		}

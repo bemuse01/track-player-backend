@@ -1,8 +1,8 @@
-// TODO 무한 스크롤 데이터 로딩 구현
-import { getAllPlaylists } from '../../models/playlist/index.js'
+// TODO 로드할 데이터 없으면 로드 방지 추가
+import { getPlaylistsByLimit } from '../../models/playlist/index.js'
 import ResponseHelper from '../../utils/api/responseHelper.js'
 
-const method = 'GET'
+const method = 'POST'
 const url = '/playlist/limit'
 const responseSchema = {
 	type: 'object',
@@ -14,7 +14,7 @@ const responseSchema = {
 }
 
 const schema = {
-	querystring: {
+	body: {
 		type: 'object',
 		properties: {
 			// playlistId: {type: 'string'},
@@ -28,7 +28,11 @@ const schema = {
 
 const handler = async (request, reply) => {
 	try {
-		const playlists = await getAllPlaylists()
+		const { lastObjectId } = request.body
+
+		console.log(lastObjectId)
+
+		const playlists = await getPlaylistsByLimit(lastObjectId)
 
 		const { status, response } = ResponseHelper.OK(playlists)
 
@@ -42,6 +46,6 @@ const handler = async (request, reply) => {
 	}
 }
 
-const getPlaylist = { method, url, schema, handler }
+const postPlaylistLimit = { method, url, schema, handler }
 
-export { getPlaylist }
+export { postPlaylistLimit }

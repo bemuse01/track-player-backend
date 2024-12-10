@@ -1,7 +1,7 @@
-import { getPlaylist } from '../controllers/playlist/index.js'
+import { postPlaylistLimit } from '../controllers/playlist/index.js'
 
 const playlist = async (fastify, options) => {
-	fastify.route(getPlaylist)
+	fastify.route(postPlaylistLimit)
 }
 
 export default playlist
