@@ -1,4 +1,3 @@
-// TODO 로드할 데이터 없으면 로드 방지 추가
 import { getPlaylistsByLimit } from '../../models/playlist/index.js'
 import ResponseHelper from '../../utils/api/responseHelper.js'
 

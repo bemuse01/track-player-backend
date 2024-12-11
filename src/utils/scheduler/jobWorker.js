@@ -3,8 +3,8 @@ import fetchData from '../api/fetchData.js'
 import DbWork from './dbWork.js'
 import LocalWork from './localWork.js'
 import StorageWork from './storageWork.js'
-
-// TODO 전 작업 p-limit으로 제한
+import pLimit from 'p-limit'
+import { PROMISE_BATCH_SIZE } from '../../config/config.js'
 
 class JobWorker {
 	constructor({ fastify, storage, youtube }) {
@@ -17,6 +17,8 @@ class JobWorker {
 		this.dbWork = new DbWork()
 		this.storageWork = new StorageWork(storage)
 		this.localWork = new LocalWork()
+
+		this.limit = pLimit(PROMISE_BATCH_SIZE)
 	}
 
 	//
@@ -46,7 +48,12 @@ class JobWorker {
 	// 삽입 작업
 	async insert() {
 		console.log('insert start')
-		await Promise.all(this.playlistIds.map((pid) => this.insertWorks(pid)))
+
+		const { limit } = this
+
+		const limits = this.playlistIds.map((pid) => limit(() => this.insertWorks(pid)))
+		await Promise.all(limits)
+
 		console.log('insert done')
 	}
 	async insertWorks(pid) {
@@ -89,7 +96,12 @@ class JobWorker {
 	// 유튜브의 플레이리스트의 내용이 업데이트 되면 실행되는 작업 메소드
 	async update() {
 		console.log('update start')
-		await Promise.all(this.playlistIds.map((pid) => this.updateWorks(pid)))
+
+		const { limit } = this
+
+		const limits = this.playlistIds.map((pid) => limit(() => this.updateWorks(pid)))
+		await Promise.all(limits)
+
 		console.log('update done')
 	}
 	async updateWorks(pid) {
@@ -127,10 +139,17 @@ class JobWorker {
 	// DB의 플레이리스트와 JSON 데이터의 플레이리스트가 일치하지 않을수도 있으므로 DB에 있는 플레이리스트를 기준으로 유무 검사
 	async delete() {
 		console.log('delete start')
+
+		const { limit } = this
+
 		const playlistIds = await this.getPlaylistIds()
 		console.log('playlists in db: ', playlistIds)
+
 		const currentPlaylistIds = playlistIds.length === 0 ? [...this.playlistIds] : playlistIds
-		await Promise.all(currentPlaylistIds.map((pid) => this.deleteWorks(pid)))
+
+		const limits = currentPlaylistIds.map((pid) => limit(() => this.deleteWorks(pid)))
+		await Promise.all(limits)
+
 		console.log('delete done')
 	}
 	async deleteWorks(pid) {
